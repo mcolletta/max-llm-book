@@ -1,4 +1,4 @@
-# Step 03: Implement Layer Normalization (`step_03.py`)
+# Step 03: Implement Layer Normalization
 
 **Purpose**: Create a custom layer normalization module for stabilizing neural network training.
 
@@ -11,9 +11,11 @@ The normalization process involves:
 2. Subtracting the mean and dividing by the standard deviation (adding a small epsilon for numerical stability)
 3. Scaling by a learned weight parameter (gamma) and shifting by a learned bias parameter (beta)
 
-Mathematically: `LayerNorm(x) = � * (x - �) / (ò + �) + �`
+Mathematically:
 
-where � is the mean, ò is the variance, � (gamma/weight) is the learned scale, and � (beta/bias) is the learned shift.
+$$\Large y = \frac{x+ϵ}{\sqrt Var[x] + ϵ} ∗ γ+β$$
+
+where μ is the mean, σ² is the variance, γ (gamma/weight) is the learned scale, and β (beta/bias) is the learned shift.
 
 ## Why Use Layer Normalization?
 
@@ -112,26 +114,7 @@ A failed test will show:
 Running tests for Step 03: Implement Layer Normalization...
 
 Results:
-L functional module is not imported from max.experimental
-   Hint: Add 'from max.experimental import functional as F'
-L Tensor is not imported from max.experimental.tensor
-   Hint: Add 'from max.experimental.tensor import Tensor'
- LayerNorm class exists
-L Tensor.ones is not used correctly for weight initialization
-   Hint: Use Tensor.ones([dim]) to initialize self.weight
-L Tensor.zeros is not used correctly for bias initialization
-   Hint: Use Tensor.zeros([dim]) to initialize self.bias
-L F.layer_norm is not used
-   Hint: Use F.layer_norm() in the __call__ method
-L F.layer_norm is not used with correct parameters
-   Hint: Use F.layer_norm(x, gamma=self.weight, beta=self.bias, epsilon=self.eps)
-L Found placeholder 'None' values that need to be replaced:
-   self.weight = None
-   self.bias = None
-   return None
-   Hint: Replace all 'None' values with the actual implementation
-L LayerNorm class instantiation failed: 'NoneType' object has no attribute '__iter__'
-   This usually means some TODO items are not completed
+❌ Error importing step_03 module: name 'Tensor' is not defined
 ```
 
 A successful test will show:
@@ -139,25 +122,18 @@ A successful test will show:
 Running tests for Step 03: Implement Layer Normalization...
 
 Results:
- functional module is correctly imported as F from max.experimental
- Tensor is correctly imported from max.experimental.tensor
- LayerNorm class exists
- Tensor.ones is used for weight initialization
- Tensor.zeros is used for bias initialization
- F.layer_norm is used
- F.layer_norm is used with correct parameters (gamma, beta, epsilon)
- All placeholder 'None' values have been replaced
- LayerNorm class can be instantiated
- LayerNorm.weight is initialized
- LayerNorm.bias is initialized
- LayerNorm.eps has correct default value: 1e-05
- LayerNorm forward pass executes without errors
- LayerNorm returns a non-None result
- Output shape is correct: (2, 4)
-
-============================================================
-<� All checks passed! Your implementation matches the solution.
-============================================================
+✅ functional module is correctly imported as F from max.experimental
+✅ Tensor is correctly imported from max.experimental.tensor
+✅ LayerNorm class exists
+✅ Tensor.ones is used for weight initialization
+✅ Tensor.zeros is used for bias initialization
+✅ F.layer_norm is used
+✅ F.layer_norm is used with correct parameters (gamma, beta, epsilon)
+✅ All placeholder 'None' values have been replaced
+✅ LayerNorm class can be instantiated
+✅ LayerNorm.weight is initialized
+✅ LayerNorm.bias is initialized
+✅ LayerNorm.eps has correct default value: 1e-05
 ```
 
 **Reference**: `solutions/solution_03.py`
