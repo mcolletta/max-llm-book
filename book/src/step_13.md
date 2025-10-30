@@ -78,30 +78,13 @@ The LM head is a linear layer without bias (`bias=False`), matching Hugging Face
    - Return `logits`
 
 **Implementation**:
+
 ```python
-from max.nn.module_v3 import Linear, Module
-
-from solutions.solution_01 import GPT2Config
-from solutions.solution_12 import GPT2Model
-
-
-class MaxGPT2LMHeadModel(Module):
-    """Complete GPT-2 model with language modeling head."""
-
-    def __init__(self, config: GPT2Config):
-        super().__init__()
-
-        self.config = config
-        self.transformer = GPT2Model(config)
-        self.lm_head = Linear(config.n_embd, config.vocab_size, bias=False)
-
-    def __call__(self, input_ids):
-        hidden_states = self.transformer(input_ids)
-        logits = self.lm_head(hidden_states)
-        return logits
+{{#include ../../steps/step_13.py}}
 ```
 
 ### Validation
+
 Run `pixi run s13`
 
 **Reference**: `solutions/solution_13.py`

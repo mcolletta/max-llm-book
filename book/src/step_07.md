@@ -80,117 +80,14 @@ GPT-2 uses a single combined linear layer called `c_attn` that projects from emb
    - Returns tuple of `(query, key, value)`
 
 **Implementation**:
+
 ```python
-from max.experimental import functional as F
-from max.nn.module_v3 import Linear, Module
-
-from solutions.solution_01 import GPT2Config
-
-
-class GPT2SingleHeadQKV(Module):
-    """Single-head Q/K/V projections for GPT-2, matching HuggingFace structure."""
-
-    def __init__(self, config: GPT2Config):
-        """Initialize Q/K/V projection layers.
-
-        Args:
-            config: GPT2Config containing n_embd
-        """
-        super().__init__()
-
-        # Single combined projection for Q, K, V (HuggingFace style)
-        # Projects from n_embd to 3 * n_embd (concatenated Q, K, V)
-        self.c_attn = Linear(config.n_embd, 3 * config.n_embd, bias=True)
-
-        # Store config for splitting
-        self.n_embd = config.n_embd
-
-    def __call__(self, x):
-        """Project input to Q, K, V.
-
-        Args:
-            x: Input tensor, shape [batch, seq_length, n_embd]
-
-        Returns:
-            Tuple of (query, key, value), each with shape [batch, seq_length, n_embd]
-        """
-        # Single projection produces concatenated Q, K, V
-        # Shape: [batch, seq_length, 3 * n_embd]
-        qkv = self.c_attn(x)
-
-        # Split into separate Q, K, V tensors
-        # Each has shape: [batch, seq_length, n_embd]
-        query, key, value = F.split(
-            qkv, [self.n_embd, self.n_embd, self.n_embd], axis=-1
-        )
-
-        return query, key, value
+{{#include ../../steps/step_07.py}}
 ```
 
 ### Validation
+
 Run `pixi run s07`
-
-A failed test will show:
-```bash
-Running tests for Step 07: Query/Key/Value Projections...
-
-Results:
-❌ Linear is not imported from max.nn.module_v3
-   Hint: Add 'from max.nn.module_v3 import Linear, Module'
-❌ Module is not imported from max.nn.module_v3
-   Hint: Add 'from max.nn.module_v3 import Linear, Module'
-❌ functional is not imported from max.experimental
-   Hint: Add 'from max.experimental import functional as F'
-❌ GPT2SingleHeadQKV class not found in step_07 module
-   Hint: Create class GPT2SingleHeadQKV(Module)
-❌ self.c_attn linear layer is not created correctly
-   Hint: Use Linear(config.n_embd, 3 * config.n_embd, bias=True)
-❌ F.split is not used
-   Hint: Use F.split(qkv, [self.n_embd, self.n_embd, self.n_embd], axis=-1)
-❌ Found placeholder 'None' values that need to be replaced:
-   self.c_attn = None
-   qkv = None
-   query, key, value = None, None, None
-   Hint: Replace all 'None' values with the actual implementation
-
-============================================================
-⚠️ Some checks failed. Review the hints above and try again.
-============================================================
-```
-
-A successful test will show:
-```bash
-Running tests for Step 07: Query/Key/Value Projections...
-
-Results:
-✅ Linear is correctly imported from max.nn.module_v3
-✅ Module is correctly imported from max.nn.module_v3
-✅ functional is correctly imported from max.experimental
-✅ GPT2SingleHeadQKV class exists
-✅ GPT2SingleHeadQKV inherits from Module
-✅ self.c_attn linear layer is created correctly
-✅ Output dimension is correctly set to 3 * n_embd
-✅ bias=True is set correctly
-✅ self.c_attn is called with input x
-✅ F.split is used to separate Q, K, V
-✅ Split sizes are correctly set to [n_embd, n_embd, n_embd]
-✅ Split axis is correctly set
-✅ All placeholder 'None' values have been replaced
-✅ GPT2SingleHeadQKV class can be instantiated
-✅ GPT2SingleHeadQKV.c_attn is initialized
-✅ GPT2SingleHeadQKV forward pass executes without errors
-✅ Query shape is correct: (2, 8, 768)
-✅ Key shape is correct: (2, 8, 768)
-✅ Value shape is correct: (2, 8, 768)
-✅ Query contains non-zero values
-✅ Key contains non-zero values
-✅ Value contains non-zero values
-✅ Query and Key are different (as expected)
-
-============================================================
-🎉 All checks passed! Your implementation is complete.
-============================================================
-```
 
 **Reference**: `solutions/solution_07.py`
 

@@ -80,64 +80,15 @@ This creates a lower triangular pattern where each token can only attend to itse
    - Creates lower triangular pattern with 0s on/below diagonal, `-inf` above
 
 **Implementation**:
+
 ```python
-# Import required modules from MAX
-from max.driver import Device
-from max.dtype import DType
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
-from max.graph import Dim, DimLike
-
-
-@F.functional
-def causal_mask(
-    sequence_length: DimLike,
-    num_tokens: DimLike,
-    *,
-    dtype: DType,
-    device: Device,
-):
-    """Create a causal mask for autoregressive attention."""
-    # Calculate total sequence length
-    n = Dim(sequence_length) + num_tokens
-
-    # Create constant tensor filled with -inf
-    mask = Tensor.constant(float("-inf"), dtype=dtype, device=device)
-
-    # Broadcast to target shape
-    mask = F.broadcast_to(mask, shape=(sequence_length, n))
-
-    # Apply band_part to create lower triangular structure
-    return F.band_part(mask, num_lower=None, num_upper=0, exclude=True)
+{{#include ../../steps/step_02.py}}
 ```
 
 ### Validation
+
 Run `pixi run s02`
 
-A failed test will show:
-```bash
-Running tests for Step 02: Implement Causal Masking...
-
-Results:
-❌ functional module is not imported from max.experimental
-❌ Tensor is not imported from max.experimental.tensor
-❌ causal_mask function does not have @F.functional decorator
-❌ causal_mask does not create Tensor.constant correctly
-❌ causal_mask does not use F.broadcast_to correctly
-❌ causal_mask does not use F.band_part correctly
-```
-
-A successful test will show:
-```bash
-Running tests for Step 02: Implement Causal Masking...
-
-Results:
-✅ functional module is correctly imported as F
-✅ Tensor is correctly imported
-✅ causal_mask has @F.functional decorator
-✅ Mask shape is correct: (sequence_length, sequence_length + num_tokens)
-✅ Mask creates proper causal (lower triangular) pattern
-✅ All implementation steps completed correctly
-```
-
 **Reference**: `solutions/solution_02.py`
+
+**Next**: In [Step 03](./step_03.md), you'll implement layer normalization to stabilize activations for effective training.

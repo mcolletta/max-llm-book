@@ -94,109 +94,14 @@ GPT-2 stacks 12 identical transformer blocks (for the base model). Each block in
    - Return the final `hidden_states`
 
 **Implementation**:
+
 ```python
-from max.nn.module_v3 import Module
-
-from solutions.solution_01 import GPT2Config
-from solutions.solution_04 import GPT2MLP
-from solutions.solution_09 import GPT2MultiHeadAttention
-from solutions.solution_10 import LayerNorm
-
-
-class GPT2Block(Module):
-    """Complete GPT-2 transformer block matching HuggingFace structure."""
-
-    def __init__(self, config: GPT2Config):
-        super().__init__()
-
-        hidden_size = config.n_embd
-        inner_dim = (
-            config.n_inner
-            if hasattr(config, "n_inner") and config.n_inner is not None
-            else 4 * hidden_size
-        )
-
-        self.ln_1 = LayerNorm(hidden_size, eps=config.layer_norm_epsilon)
-        self.attn = GPT2MultiHeadAttention(config)
-        self.ln_2 = LayerNorm(hidden_size, eps=config.layer_norm_epsilon)
-        self.mlp = GPT2MLP(inner_dim, config)
-
-    def __call__(self, hidden_states):
-        # Attention block with residual connection
-        residual = hidden_states
-        hidden_states = self.ln_1(hidden_states)
-        attn_output = self.attn(hidden_states)
-        hidden_states = attn_output + residual
-
-        # MLP block with residual connection
-        residual = hidden_states
-        hidden_states = self.ln_2(hidden_states)
-        feed_forward_hidden_states = self.mlp(hidden_states)
-        hidden_states = residual + feed_forward_hidden_states
-
-        return hidden_states
+{{#include ../../steps/step_11.py}}
 ```
 
 ### Validation
+
 Run `pixi run s11`
-
-A failed test will show:
-```bash
-Running tests for Step 11: Transformer Block...
-
-Results:
-❌ Module is not imported from max.nn.module_v3
-   Hint: Add 'from max.nn.module_v3 import Module'
-❌ GPT2Config is not imported
-   Hint: Add 'from solutions.solution_01 import GPT2Config'
-❌ GPT2MLP is not imported
-   Hint: Add 'from solutions.solution_04 import GPT2MLP'
-❌ GPT2MultiHeadAttention is not imported
-   Hint: Add 'from solutions.solution_09 import GPT2MultiHeadAttention'
-❌ LayerNorm is not imported
-   Hint: Add 'from solutions.solution_10 import LayerNorm'
-❌ Found placeholder 'None' values that need to be replaced
-
-============================================================
-⚠️ Some checks failed. Review the hints above and try again.
-============================================================
-```
-
-A successful test will show:
-```bash
-Running tests for Step 11: Transformer Block...
-
-Results:
-✅ Module is correctly imported from max.nn.module_v3
-✅ GPT2Config is correctly imported from solutions.solution_01
-✅ GPT2MLP is correctly imported from solutions.solution_04
-✅ GPT2MultiHeadAttention is correctly imported from solutions.solution_09
-✅ LayerNorm is correctly imported from solutions.solution_10
-✅ GPT2Block class exists
-✅ GPT2Block inherits from Module
-✅ self.ln_1 is created correctly
-✅ self.attn is created correctly
-✅ self.ln_2 is created correctly
-✅ self.mlp is created correctly
-✅ Forward pass calls ln_1
-✅ Forward pass calls attn
-✅ Forward pass calls ln_2
-✅ Forward pass calls mlp
-✅ Forward pass uses residual connections (at least 2)
-✅ All placeholder 'None' values have been replaced
-✅ GPT2Block class can be instantiated
-✅ GPT2Block.ln_1 is initialized
-✅ GPT2Block.attn is initialized
-✅ GPT2Block.ln_2 is initialized
-✅ GPT2Block.mlp is initialized
-✅ GPT2Block forward pass executes without errors
-✅ Output shape is correct: (2, 8, 768)
-✅ Output contains non-zero values
-
-============================================================
-🎉 All checks passed! Your implementation is complete.
-============================================================
-```
 
 **Reference**: `solutions/solution_11.py`
 

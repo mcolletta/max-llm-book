@@ -102,121 +102,14 @@ where $Q$ is the query matrix, $K$ is the key matrix, $V$ is the value matrix, a
    - Return the attention output
 
 **Implementation**:
+
 ```python
-import math
-
-from max.driver import Device
-from max.dtype import DType
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
-from max.graph import Dim, DimLike
-
-
-@F.functional
-def causal_mask(
-    sequence_length: DimLike,
-    num_tokens: DimLike,
-    *,
-    dtype: DType,
-    device: Device,
-):
-    """Create a causal attention mask."""
-    n = Dim(sequence_length) + num_tokens
-    mask = Tensor.constant(float("-inf"), dtype=dtype, device=device)
-    mask = F.broadcast_to(mask, shape=(sequence_length, n))
-    return F.band_part(mask, num_lower=None, num_upper=0, exclude=True)
-
-
-def compute_attention(query, key, value):
-    """Compute scaled dot-product attention with causal masking."""
-    # Step 1: Compute attention scores
-    attn_weights = query @ key.transpose(-1, -2)
-
-    # Step 2: Scale by sqrt(d_k)
-    scale_factor = math.sqrt(int(value.shape[-1]))
-    attn_weights = attn_weights / scale_factor
-
-    # Step 3: Apply causal mask
-    seq_len = query.shape[-2]
-    mask = causal_mask(seq_len, 0, dtype=query.dtype, device=query.device)
-    attn_weights = attn_weights + mask
-
-    # Step 4: Softmax
-    attn_weights = F.softmax(attn_weights)
-
-    # Step 5: Weighted sum of values
-    attn_output = attn_weights @ value
-
-    return attn_output
+{{#include ../../steps/step_08.py}}
 ```
 
 ### Validation
+
 Run `pixi run s08`
-
-A failed test will show:
-```bash
-Running tests for Step 08: Attention Mechanism with Causal Masking...
-
-Results:
-❌ math is not imported
-   Hint: Add 'import math' at the top
-❌ functional is not imported from max.experimental
-   Hint: Add 'from max.experimental import functional as F'
-❌ Tensor is not imported from max.experimental.tensor
-   Hint: Add 'from max.experimental.tensor import Tensor'
-❌ causal_mask function not found in step_08 module
-   Hint: Define causal_mask function with @F.functional decorator
-❌ compute_attention function not found in step_08 module
-   Hint: Define compute_attention function
-❌ Attention scores should be computed with query @ key.transpose(-1, -2)
-   Hint: attn_weights = query @ key.transpose(-1, -2)
-❌ Found placeholder 'None' values that need to be replaced:
-   return None
-   attn_weights = None
-   return None
-   Hint: Replace all 'None' values with the actual implementation
-
-============================================================
-⚠️ Some checks failed. Review the hints above and try again.
-============================================================
-```
-
-A successful test will show:
-```bash
-Running tests for Step 08: Attention Mechanism with Causal Masking...
-
-Results:
-✅ math is correctly imported
-✅ functional is correctly imported from max.experimental
-✅ Tensor is correctly imported from max.experimental.tensor
-✅ Device is correctly imported from max.driver
-✅ DType is correctly imported from max.dtype
-✅ Dim is correctly imported from max.graph
-✅ DimLike is correctly imported from max.graph
-✅ causal_mask function exists
-✅ compute_attention function exists
-✅ causal_mask uses @F.functional decorator
-✅ causal_mask creates -inf constant correctly
-✅ causal_mask uses F.broadcast_to
-✅ causal_mask uses F.band_part
-✅ Attention scores computed with Q @ K^T
-✅ Scaling uses math.sqrt
-✅ Causal mask is applied to attention weights
-✅ Softmax is applied to attention weights
-✅ Weighted sum computed with attention @ value
-✅ All placeholder 'None' values have been replaced
-✅ causal_mask executes without errors
-✅ causal_mask shape is correct: (4, 4)
-✅ causal_mask has correct values (0 for past/present, -inf for future)
-✅ compute_attention executes without errors
-✅ compute_attention output shape is correct: (2, 4, 64)
-✅ Output contains non-zero values
-✅ Output is different from input value (attention is applied)
-
-============================================================
-🎉 All checks passed! Your implementation is complete.
-============================================================
-```
 
 **Reference**: `solutions/solution_08.py`
 

@@ -75,97 +75,14 @@ These position vectors are added to token embeddings before entering the transfo
    - Return the result directly
 
 **Implementation**:
+
 ```python
-from max.experimental.tensor import Tensor
-from max.nn.module_v3 import Embedding, Module
-
-from solutions.solution_01 import GPT2Config
-
-
-class GPT2PositionEmbeddings(Module):
-    """Position embeddings for GPT-2, matching HuggingFace structure."""
-
-    def __init__(self, config: GPT2Config):
-        """Initialize position embedding layer.
-
-        Args:
-            config: GPT2Config containing n_positions and n_embd
-        """
-        super().__init__()
-
-        # Position embedding: lookup table from position indices to embedding vectors
-        # This encodes "where" information - position 0, 1, 2, etc.
-        self.wpe = Embedding(config.n_positions, dim=config.n_embd)
-
-    def __call__(self, position_ids):
-        """Convert position indices to embeddings.
-
-        Args:
-            position_ids: Tensor of position indices, shape [seq_length] or [batch_size, seq_length]
-
-        Returns:
-            Position embeddings, shape matching input with added embedding dimension
-        """
-        # Simple lookup: each position index becomes its corresponding embedding vector
-        return self.wpe(position_ids)
+{{#include ../../steps/step_06.py}}
 ```
 
 ### Validation
+
 Run `pixi run s06`
-
-A failed test will show:
-```bash
-Running tests for Step 06: Position Embeddings...
-
-Results:
-❌ Tensor is not imported from max.experimental.tensor
-   Hint: Add 'from max.experimental.tensor import Tensor'
-❌ Embedding is not imported from max.nn.module_v3
-   Hint: Add 'from max.nn.module_v3 import Embedding, Module'
-❌ Module is not imported from max.nn.module_v3
-   Hint: Add 'from max.nn.module_v3 import Embedding, Module'
-❌ GPT2PositionEmbeddings class not found in step_06 module
-   Hint: Create class GPT2PositionEmbeddings(Module)
-❌ self.wpe embedding layer is not created correctly
-   Hint: Use Embedding(config.n_positions, dim=config.n_embd)
-❌ self.wpe is not called with position_ids
-   Hint: Return self.wpe(position_ids) in the __call__ method
-❌ Found placeholder 'None' values that need to be replaced:
-   self.wpe = None
-   return None
-   Hint: Replace all 'None' values with the actual implementation
-
-============================================================
-⚠️ Some checks failed. Review the hints above and try again.
-============================================================
-```
-
-A successful test will show:
-```bash
-Running tests for Step 06: Position Embeddings...
-
-Results:
-✅ Tensor is correctly imported from max.experimental.tensor
-✅ Embedding is correctly imported from max.nn.module_v3
-✅ Module is correctly imported from max.nn.module_v3
-✅ GPT2PositionEmbeddings class exists
-✅ GPT2PositionEmbeddings inherits from Module
-✅ self.wpe embedding layer is created correctly
-✅ config.n_positions is used correctly
-✅ config.n_embd is used correctly
-✅ self.wpe is called with position_ids in __call__ method
-✅ All placeholder 'None' values have been replaced
-✅ GPT2PositionEmbeddings class can be instantiated
-✅ GPT2PositionEmbeddings.wpe is initialized
-✅ GPT2PositionEmbeddings forward pass executes without errors
-✅ Output shape is correct: (8, 768)
-✅ Output contains non-zero embedding values
-✅ Different positions produce different embeddings
-
-============================================================
-🎉 All checks passed! Your implementation is complete.
-============================================================
-```
 
 **Reference**: `solutions/solution_06.py`
 

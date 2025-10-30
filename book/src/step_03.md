@@ -76,61 +76,15 @@ GPT-2 applies layer normalization before the attention and MLP blocks in each tr
    - The epsilon value (1e-5) is already set in `__init__`
 
 **Implementation**:
+
 ```python
-# Import required modules from MAX
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
-from max.graph import DimLike
-from max.nn.module_v3 import Module
-
-
-class LayerNorm(Module):
-    """Layer normalization module."""
-
-    def __init__(self, dim: DimLike, *, eps: float = 1e-5):
-        super().__init__()
-        self.eps = eps
-
-        # Initialize learnable weight parameter (gamma)
-        self.weight = Tensor.ones([dim])
-
-        # Initialize learnable bias parameter (beta)
-        self.bias = Tensor.zeros([dim])
-
-    def __call__(self, x: Tensor) -> Tensor:
-        """Apply layer normalization."""
-        # Apply layer normalization with learned parameters
-        return F.layer_norm(x, gamma=self.weight, beta=self.bias, epsilon=self.eps)
+{{#include ../../steps/step_03.py}}
 ```
 
 ### Validation
+
 Run `pixi run s03`
 
-A failed test will show:
-```bash
-Running tests for Step 03: Implement Layer Normalization...
-
-Results:
-❌ Error importing step_03 module: name 'Tensor' is not defined
-```
-
-A successful test will show:
-```bash
-Running tests for Step 03: Implement Layer Normalization...
-
-Results:
-✅ functional module is correctly imported as F from max.experimental
-✅ Tensor is correctly imported from max.experimental.tensor
-✅ LayerNorm class exists
-✅ Tensor.ones is used for weight initialization
-✅ Tensor.zeros is used for bias initialization
-✅ F.layer_norm is used
-✅ F.layer_norm is used with correct parameters (gamma, beta, epsilon)
-✅ All placeholder 'None' values have been replaced
-✅ LayerNorm class can be instantiated
-✅ LayerNorm.weight is initialized
-✅ LayerNorm.bias is initialized
-✅ LayerNorm.eps has correct default value: 1e-05
-```
-
 **Reference**: `solutions/solution_03.py`
+
+**Next**: In [Step 04](./step_04.md), you'll implement the feed-forward network (MLP) with GELU activation used in each transformer block.

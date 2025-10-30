@@ -95,39 +95,9 @@ This stacking creates a hierarchy of representations. Early blocks might learn s
    - Return `x`
 
 **Implementation**:
+
 ```python
-from max.experimental.tensor import Tensor
-from max.nn.module_v3 import Embedding, Module, Sequential
-
-from solutions.solution_01 import GPT2Config
-from solutions.solution_10 import LayerNorm
-from solutions.solution_11 import GPT2Block
-
-
-class GPT2Model(Module):
-    """Complete GPT-2 transformer model matching HuggingFace structure."""
-
-    def __init__(self, config: GPT2Config):
-        super().__init__()
-
-        self.wte = Embedding(config.vocab_size, dim=config.n_embd)
-        self.wpe = Embedding(config.n_positions, dim=config.n_embd)
-        self.h = Sequential(*(GPT2Block(config) for _ in range(config.n_layer)))
-        self.ln_f = LayerNorm(config.n_embd, eps=config.layer_norm_epsilon)
-
-    def __call__(self, input_ids):
-        batch_size, seq_length = input_ids.shape
-
-        tok_embeds = self.wte(input_ids)
-        pos_embeds = self.wpe(
-            Tensor.arange(seq_length, dtype=input_ids.dtype, device=input_ids.device)
-        )
-
-        x = tok_embeds + pos_embeds
-        x = self.h(x)
-        x = self.ln_f(x)
-
-        return x
+{{#include ../../steps/step_12.py}}
 ```
 
 ### Validation

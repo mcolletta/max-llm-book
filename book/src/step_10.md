@@ -101,114 +101,14 @@ $$\text{output} = x + \text{Sublayer}(\text{LayerNorm}(x))$$
    - Standalone function demonstrating the pattern
 
 **Implementation**:
+
 ```python
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
-from max.graph import DimLike
-from max.nn.module_v3 import Module
-
-
-class LayerNorm(Module):
-    """Layer normalization module matching HuggingFace GPT-2."""
-
-    def __init__(self, dim: DimLike, *, eps: float = 1e-5):
-        super().__init__()
-        self.eps = eps
-        # Learnable scale parameter (gamma)
-        self.weight = Tensor.ones([dim])
-        # Learnable shift parameter (beta)
-        self.bias = Tensor.zeros([dim])
-
-    def __call__(self, x: Tensor) -> Tensor:
-        return F.layer_norm(x, gamma=self.weight, beta=self.bias, epsilon=self.eps)
-
-
-class ResidualBlock(Module):
-    """Demonstrates residual connections with layer normalization."""
-
-    def __init__(self, dim: int, eps: float = 1e-5):
-        super().__init__()
-        self.ln = LayerNorm(dim, eps=eps)
-
-    def __call__(self, x: Tensor, sublayer_output: Tensor) -> Tensor:
-        # In a real transformer: x = x + sublayer(layer_norm(x))
-        return x + sublayer_output
-
-
-def apply_residual_connection(input_tensor: Tensor, sublayer_output: Tensor) -> Tensor:
-    """Apply a residual connection by adding input to sublayer output."""
-    return input_tensor + sublayer_output
+{{#include ../../steps/step_10.py}}
 ```
 
 ### Validation
+
 Run `pixi run s10`
-
-A failed test will show:
-```bash
-Running tests for Step 10: Residual Connections and Layer Normalization...
-
-Results:
-❌ functional is not imported from max.experimental
-   Hint: Add 'from max.experimental import functional as F'
-❌ Tensor is not imported from max.experimental.tensor
-   Hint: Add 'from max.experimental.tensor import Tensor'
-❌ LayerNorm class not found in step_10 module
-   Hint: Create class LayerNorm(Module)
-❌ LayerNorm should use Tensor.ones for weight
-   Hint: self.weight = Tensor.ones([dim])
-❌ LayerNorm should use F.layer_norm
-   Hint: return F.layer_norm(x, gamma=self.weight, beta=self.bias, epsilon=self.eps)
-❌ Found placeholder 'None' values that need to be replaced:
-   self.weight = None
-   self.bias = None
-   return None
-   Hint: Replace all 'None' values with the actual implementation
-
-============================================================
-⚠️ Some checks failed. Review the hints above and try again.
-============================================================
-```
-
-A successful test will show:
-```bash
-Running tests for Step 10: Residual Connections and Layer Normalization...
-
-Results:
-✅ functional is correctly imported from max.experimental
-✅ Tensor is correctly imported from max.experimental.tensor
-✅ DimLike is correctly imported from max.graph
-✅ Module is correctly imported from max.nn.module_v3
-✅ LayerNorm class exists
-✅ ResidualBlock class exists
-✅ apply_residual_connection function exists
-✅ LayerNorm inherits from Module
-✅ ResidualBlock inherits from Module
-✅ LayerNorm uses Tensor.ones for weight
-✅ LayerNorm uses Tensor.zeros for bias
-✅ LayerNorm uses F.layer_norm
-✅ LayerNorm passes weight as gamma parameter
-✅ LayerNorm passes bias as beta parameter
-✅ ResidualBlock creates LayerNorm instance
-✅ Residual connections use addition operator
-✅ All placeholder 'None' values have been replaced
-✅ LayerNorm class can be instantiated
-✅ LayerNorm.weight is initialized
-✅ LayerNorm.bias is initialized
-✅ LayerNorm forward pass executes without errors
-✅ LayerNorm output shape is correct: (2, 8, 768)
-✅ LayerNorm output has mean ≈ 0 (normalized)
-✅ LayerNorm output has std ≈ 1 (normalized)
-✅ ResidualBlock class can be instantiated
-✅ ResidualBlock.ln is initialized
-✅ ResidualBlock forward pass executes without errors
-✅ ResidualBlock correctly adds input + sublayer_output
-✅ apply_residual_connection executes without errors
-✅ apply_residual_connection correctly adds tensors
-
-============================================================
-🎉 All checks passed! Your implementation is complete.
-============================================================
-```
 
 **Reference**: `solutions/solution_10.py`
 

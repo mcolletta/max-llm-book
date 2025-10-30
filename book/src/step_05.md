@@ -73,92 +73,14 @@ These learned embeddings capture semantic relationships—similar words end up w
    - Return the result directly
 
 **Implementation**:
+
 ```python
-from max.nn.module_v3 import Embedding, Module
-
-from solutions.solution_01 import GPT2Config
-
-
-class GPT2Embeddings(Module):
-    """Token embeddings for GPT-2, matching HuggingFace structure."""
-
-    def __init__(self, config: GPT2Config):
-        """Initialize token embedding layer.
-
-        Args:
-            config: GPT2Config containing vocab_size and n_embd
-        """
-        super().__init__()
-
-        # Token embedding: lookup table from vocab_size to embedding dimension
-        # This converts discrete token IDs (0 to vocab_size-1) into dense vectors
-        self.wte = Embedding(config.vocab_size, dim=config.n_embd)
-
-    def __call__(self, input_ids):
-        """Convert token IDs to embeddings.
-
-        Args:
-            input_ids: Tensor of token IDs, shape [batch_size, seq_length]
-
-        Returns:
-            Token embeddings, shape [batch_size, seq_length, n_embd]
-        """
-        # Simple lookup: each token ID becomes its corresponding embedding vector
-        return self.wte(input_ids)
+{{#include ../../steps/step_05.py}}
 ```
 
 ### Validation
+
 Run `pixi run s05`
-
-A failed test will show:
-```bash
-Running tests for Step 05: Token Embeddings...
-
-Results:
-❌ Embedding is not imported from max.nn.module_v3
-   Hint: Add 'from max.nn.module_v3 import Embedding, Module'
-❌ Module is not imported from max.nn.module_v3
-   Hint: Add 'from max.nn.module_v3 import Embedding, Module'
-❌ GPT2Embeddings class not found in step_05 module
-   Hint: Create class GPT2Embeddings(Module)
-❌ self.wte embedding layer is not created correctly
-   Hint: Use Embedding(config.vocab_size, dim=config.n_embd)
-❌ self.wte is not called with input_ids
-   Hint: Return self.wte(input_ids) in the __call__ method
-❌ Found placeholder 'None' values that need to be replaced:
-   self.wte = None
-   return None
-   Hint: Replace all 'None' values with the actual implementation
-
-============================================================
-⚠️ Some checks failed. Review the hints above and try again.
-============================================================
-```
-
-A successful test will show:
-```bash
-Running tests for Step 05: Token Embeddings...
-
-Results:
-✅ Embedding is correctly imported from max.nn.module_v3
-✅ Module is correctly imported from max.nn.module_v3
-✅ GPT2Embeddings class exists
-✅ GPT2Embeddings inherits from Module
-✅ self.wte embedding layer is created correctly
-✅ config.vocab_size is used correctly
-✅ config.n_embd is used correctly
-✅ self.wte is called with input_ids in __call__ method
-✅ All placeholder 'None' values have been replaced
-✅ GPT2Embeddings class can be instantiated
-✅ GPT2Embeddings.wte is initialized
-✅ GPT2Embeddings forward pass executes without errors
-✅ Output shape is correct: (2, 4, 768)
-✅ Output contains non-zero embedding values
-
-============================================================
-🎉 All checks passed! Your implementation is complete.
-============================================================
-```
 
 **Reference**: `solutions/solution_05.py`
 

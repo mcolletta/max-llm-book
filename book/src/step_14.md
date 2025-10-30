@@ -113,53 +113,13 @@ where $z_i$ are the logits, $T$ is the temperature, and $P(x_i)$ is the probabil
    - Concatenate: `F.concat([generated_tokens, next_token_2d], axis=1)`
 
 **Implementation**:
+
 ```python
-import numpy as np
-
-from max.driver import CPU
-from max.dtype import DType
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
-
-
-def generate_next_token(model, input_ids, temperature=1.0, do_sample=True):
-    logits = model(input_ids)
-    next_token_logits = logits[0, -1, :]
-
-    if do_sample and temperature > 0:
-        temp_tensor = Tensor.constant(
-            temperature, dtype=next_token_logits.dtype, device=next_token_logits.device
-        )
-        next_token_logits = next_token_logits / temp_tensor
-        probs = F.softmax(next_token_logits)
-
-        probs_np = np.from_dlpack(probs.to(CPU()))
-        next_token_id = np.random.choice(len(probs_np), p=probs_np)
-        next_token_tensor = Tensor.constant(
-            next_token_id, dtype=DType.int64, device=input_ids.device
-        )
-    else:
-        next_token_tensor = F.argmax(next_token_logits)
-
-    return next_token_tensor
-
-
-def generate_tokens(
-    model, input_ids, max_new_tokens=10, temperature=1.0, do_sample=True
-):
-    generated_tokens = input_ids
-
-    for _ in range(max_new_tokens):
-        next_token = generate_next_token(
-            model, generated_tokens, temperature=temperature, do_sample=do_sample
-        )
-        next_token_2d = next_token.reshape([1, -1])
-        generated_tokens = F.concat([generated_tokens, next_token_2d], axis=1)
-
-    return generated_tokens
+{{#include ../../steps/step_14.py}}
 ```
 
 ### Validation
+
 Run `pixi run s14`
 
 **Reference**: `solutions/solution_14.py`

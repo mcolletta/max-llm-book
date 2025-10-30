@@ -80,6 +80,61 @@ Each step includes:
 By the end, you'll have a complete GPT-2 implementation and practical experience
 with MAX's Python API—skills you can immediately apply to your own projects.
 
+## Validating Your Work
+
+Each step includes automated tests that verify your implementation is correct
+before moving forward. This immediate feedback helps you catch issues early and
+build confidence as you progress.
+
+### Running Tests
+
+To validate a step, use the corresponding test command. For example, to test
+Step 01:
+
+```bash
+pixi run s01
+```
+
+### Understanding Test Output
+
+**Successful completion** shows all checks passing with ✅ marks:
+
+```bash
+Running tests for Step 01: Create Model Configuration...
+
+Results:
+✅ dataclass is correctly imported from dataclasses
+✅ GPT2Config has the @dataclass decorator
+✅ vocab_size is correct
+✅ n_positions is correct
+✅ n_embd is correct
+✅ n_layer is correct
+✅ n_head is correct
+✅ n_inner is correct
+✅ layer_norm_epsilon is correct
+```
+
+**Incomplete or incorrect implementation** shows specific failures with ❌ marks:
+
+```bash
+Running tests for Step 01: Create Model Configuration...
+
+Results:
+❌ dataclass is not imported from dataclasses
+❌ GPT2Config does not have the @dataclass decorator
+❌ vocab_size is incorrect: expected match with Hugging Face model configuration, got None
+❌ n_positions is incorrect: expected match with Hugging Face model configuration, got None
+❌ n_embd is incorrect: expected match with Hugging Face model configuration, got None
+❌ n_layer is incorrect: expected match with Hugging Face model configuration, got None
+❌ n_head is incorrect: expected match with Hugging Face model configuration, got None
+❌ n_inner is incorrect: expected match with Hugging Face model configuration, got None
+❌ layer_norm_epsilon is incorrect: expected match with Hugging Face model configuration, got None
+```
+
+The test output tells you exactly what needs to be fixed, making it easy to
+iterate until your implementation is correct. Once all checks pass, you're ready
+to move on to the next step.
+
 ## Prerequisites
 
 This tutorial assumes:

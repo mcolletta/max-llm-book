@@ -97,102 +97,15 @@ $$\text{GELU}(x) \approx 0.5 \cdot x \cdot \left(1 + \tanh\left(\sqrt{\frac{2}{\
    - Return the final result
 
 **Implementation**:
+
 ```python
-# Import required modules from MAX
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
-from max.nn.module_v3 import Linear, Module
-
-from solutions.solution_01 import GPT2Config
-
-
-class GPT2MLP(Module):
-    """Feed-forward network matching HuggingFace GPT-2 structure."""
-
-    def __init__(self, intermediate_size: int, config: GPT2Config):
-        super().__init__()
-        embed_dim = config.n_embd
-
-        # Create expansion layer
-        self.c_fc = Linear(embed_dim, intermediate_size, bias=True)
-
-        # Create projection layer
-        self.c_proj = Linear(intermediate_size, embed_dim, bias=True)
-
-    def __call__(self, hidden_states: Tensor) -> Tensor:
-        """Apply feed-forward network."""
-        # Expand to intermediate dimension
-        hidden_states = self.c_fc(hidden_states)
-
-        # Apply non-linear activation
-        hidden_states = F.gelu(hidden_states, approximate="tanh")
-
-        # Project back to embedding dimension
-        hidden_states = self.c_proj(hidden_states)
-        return hidden_states
+{{#include ../../steps/step_04.py}}
 ```
 
 ### Validation
+
 Run `pixi run s04`
 
-A failed test will show:
-```bash
-Running tests for Step 04: Implement GPT-2 MLP (Feed-Forward Network)...
-
-Results:
-❌ functional module is not imported from max.experimental
-   Hint: Add 'from max.experimental import functional as F'
-❌ Tensor is not imported from max.experimental.tensor
-   Hint: Add 'from max.experimental.tensor import Tensor'
-❌ Linear and Module are not imported from max.nn.module_v3
-   Hint: Add 'from max.nn.module_v3 import Linear, Module'
-❌ GPT2MLP class not found in step_04 module
-❌ self.c_fc Linear layer is not created correctly
-   Hint: Use Linear(embed_dim, intermediate_size, bias=True)
-❌ self.c_proj Linear layer is not created correctly
-   Hint: Use Linear(intermediate_size, embed_dim, bias=True)
-❌ self.c_fc is not applied to hidden_states
-   Hint: Apply self.c_fc to hidden_states in the __call__ method
-❌ F.gelu is not used
-   Hint: Use F.gelu() for the activation function
-❌ self.c_proj is not applied to hidden_states
-   Hint: Apply self.c_proj to hidden_states after the activation
-❌ Found placeholder 'None' values that need to be replaced:
-   self.c_fc = None
-   self.c_proj = None
-   hidden_states = None
-   return None
-   Hint: Replace all 'None' values with the actual implementation
-
-============================================================
-⚠️ Some checks failed. Review the hints above and try again.
-============================================================
-```
-
-A successful test will show:
-```bash
-Running tests for Step 04: Implement GPT-2 MLP (Feed-Forward Network)...
-
-Results:
-✅ functional module is correctly imported as F from max.experimental
-✅ Tensor is correctly imported from max.experimental.tensor
-✅ Linear and Module are imported from max.nn.module_v3
-✅ GPT2MLP class exists
-✅ self.c_fc Linear layer is created correctly
-✅ self.c_proj Linear layer is created correctly
-✅ self.c_fc is applied to hidden_states
-✅ F.gelu is used with approximate='tanh'
-✅ self.c_proj is applied to hidden_states
-✅ All placeholder 'None' values have been replaced
-✅ GPT2MLP class can be instantiated
-✅ GPT2MLP.c_fc is initialized
-✅ GPT2MLP.c_proj is initialized
-✅ GPT2MLP forward pass executes without errors
-✅ Output shape is correct: (1, 4, 768)
-
-============================================================
-🎉 All checks passed! Your implementation matches the solution.
-============================================================
-```
-
 **Reference**: `solutions/solution_04.py`
+
+**Next**: In [Step 05](./step_05.md), you'll implement token embeddings to convert discrete token IDs into continuous vector representations.
