@@ -106,7 +106,7 @@ class GPT2MultiHeadAttention(Module):
         # Hint: Apply causal mask using causal_mask function
         # Hint: Apply softmax: F.softmax(attn_weights)
         # Hint: Weighted sum: attn_weights @ value
-        return None  # Line 100-103
+        return None
 
     def __call__(self, hidden_states):
         """Apply multi-head attention.

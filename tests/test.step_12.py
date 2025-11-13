@@ -206,7 +206,7 @@ def test_step_12():
         print("\n" + "=" * 60)
         print("🎉 All checks passed! Your implementation is complete.")
         print("=" * 60)
-        print("\n🎊 Congratulations! You've completed all 14 steps!")
+        print("\n🎊 Congratulations! You've completed all 12 steps!")
         print("You've built a complete GPT-2 model from scratch in MAX!")
     else:
         print("\n" + "=" * 60)
