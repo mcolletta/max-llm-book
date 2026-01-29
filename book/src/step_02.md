@@ -2,7 +2,8 @@
 
 <div class="note">
 
-Learn to build the feed-forward network—also known as a multilayer perceptron (MLP)—that processes information after attention in each transformer block.
+Learn to build the feed-forward network—also known as a multilayer perceptron
+(MLP)—that processes information after attention in each transformer block.
 
 </div>
 
@@ -25,7 +26,9 @@ many architectures since.
 
 The MLP has three steps applied in sequence:
 
-**Expansion layer (`c_fc`)**: Projects from 768 to 3,072 dimensions using a linear layer. This expansion gives the network more capacity to process information.
+**Expansion layer (`c_fc`)**: Projects from 768 to 3,072 dimensions using a
+linear layer. This expansion gives the network more capacity to process
+information.
 
 **GELU activation**: Applies Gaussian Error Linear Unit, a smooth non-linear
 function. GPT-2 uses `approximate="tanh"` for the tanh-based approximation
@@ -49,11 +52,13 @@ You'll use the following MAX operations to complete this task:
 
 **Linear layers**:
 
-- [`Linear(in_features, out_features, bias=True)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.module_v3.Linear): Applies linear transformation `y = xW^T + b`
+- [`Linear(in_features, out_features, bias=True)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.Linear):
+  Applies linear transformation `y = xW^T + b`
 
 **GELU activation**:
 
-- [`F.gelu(input, approximate="tanh")`](https://docs.modular.com/max/api/python/experimental/functional#max.experimental.functional.gelu): Applies GELU activation with tanh approximation for faster computation
+- [`F.gelu(input, approximate="tanh")`](https://docs.modular.com/max/api/python/nn/functional#max.nn.functional.gelu):
+  Applies GELU activation with tanh approximation for faster computation
 
 </div>
 
@@ -105,4 +110,5 @@ Run `pixi run s02` to verify your implementation.
 
 </details>
 
-**Next**: In [Step 03](./step_03.md), you’ll implement causal masking to prevent tokens from attending to future positions in autoregressive generation.
+**Next**: In [Step 03](./step_03.md), you'll implement causal masking to prevent
+tokens from attending to future positions in autoregressive generation.

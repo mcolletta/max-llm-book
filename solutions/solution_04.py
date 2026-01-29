@@ -1,27 +1,28 @@
-"""
-Solution for Step 04: Multi-head Attention
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
+"""Solution for Step 04: Multi-head Attention
 
 This module implements multi-head attention, which allows the model to jointly
 attend to information from different representation subspaces at different positions.
 """
 
 import math
+from typing import cast
 
-from max.driver import Device
-from max.dtype import DType
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
-from max.graph import Dim, DimLike
-from max.nn.module_v3 import Linear, Module
-
-from solution_01 import GPT2Config
-from solution_03 import causal_mask
+import max.functional as F
+from max.nn import Linear, Module
+from max.tensor import Tensor
+from step_01 import GPT2Config
+from step_03 import causal_mask
 
 
 class GPT2MultiHeadAttention(Module):
     """Multi-head attention for GPT-2, matching HuggingFace structure."""
 
-    def __init__(self, config: GPT2Config):
+    def __init__(self, config: GPT2Config) -> None:
         """Initialize multi-head attention.
 
         Args:
@@ -39,7 +40,9 @@ class GPT2MultiHeadAttention(Module):
         # Output projection
         self.c_proj = Linear(self.embed_dim, self.embed_dim, bias=True)
 
-    def _split_heads(self, tensor, num_heads, attn_head_size):
+    def _split_heads(
+        self, tensor: Tensor, num_heads: int, attn_head_size: int
+    ) -> Tensor:
         """Split the last dimension into (num_heads, head_size).
 
         Transforms shape from [batch, seq_length, n_embd]
@@ -54,12 +57,14 @@ class GPT2MultiHeadAttention(Module):
             Tensor with shape [batch, num_heads, seq_length, head_size]
         """
         # Add head dimension: [batch, seq_length, n_embd] -> [batch, seq_length, num_heads, head_size]
-        new_shape = tensor.shape[:-1] + [num_heads, attn_head_size]
+        new_shape = list(tensor.shape[:-1]) + [num_heads, attn_head_size]
         tensor = tensor.reshape(new_shape)
         # Move heads dimension: [batch, seq_length, num_heads, head_size] -> [batch, num_heads, seq_length, head_size]
         return tensor.transpose(-3, -2)
 
-    def _merge_heads(self, tensor, num_heads, attn_head_size):
+    def _merge_heads(
+        self, tensor: Tensor, num_heads: int, attn_head_size: int
+    ) -> Tensor:
         """Merge attention heads back to original shape.
 
         Transforms shape from [batch, num_heads, seq_length, head_size]
@@ -76,10 +81,10 @@ class GPT2MultiHeadAttention(Module):
         # Move heads dimension back: [batch, num_heads, seq_length, head_size] -> [batch, seq_length, num_heads, head_size]
         tensor = tensor.transpose(-3, -2)
         # Flatten head dimensions: [batch, seq_length, num_heads, head_size] -> [batch, seq_length, n_embd]
-        new_shape = tensor.shape[:-2] + [num_heads * attn_head_size]
+        new_shape = list(tensor.shape[:-2]) + [num_heads * attn_head_size]
         return tensor.reshape(new_shape)
 
-    def _attn(self, query, key, value):
+    def _attn(self, query: Tensor, key: Tensor, value: Tensor) -> Tensor:
         """Compute attention for all heads in parallel.
 
         Args:
@@ -107,7 +112,7 @@ class GPT2MultiHeadAttention(Module):
 
         return attn_output
 
-    def forward(self, hidden_states):
+    def forward(self, hidden_states: Tensor) -> Tensor:
         """Apply multi-head attention.
 
         Args:
@@ -118,9 +123,12 @@ class GPT2MultiHeadAttention(Module):
         """
         # Project to Q, K, V
         qkv = self.c_attn(hidden_states)
-        query, key, value = F.split(
+        split_result = F.split(
             qkv, [self.split_size, self.split_size, self.split_size], axis=-1
         )
+        query = cast(Tensor, split_result[0])
+        key = cast(Tensor, split_result[1])
+        value = cast(Tensor, split_result[2])
 
         # Split into multiple heads
         query = self._split_heads(query, self.num_heads, self.head_dim)
@@ -131,7 +139,9 @@ class GPT2MultiHeadAttention(Module):
         attn_output = self._attn(query, key, value)
 
         # Merge heads back
-        attn_output = self._merge_heads(attn_output, self.num_heads, self.head_dim)
+        attn_output = self._merge_heads(
+            attn_output, self.num_heads, self.head_dim
+        )
 
         # Output projection
         attn_output = self.c_proj(attn_output)

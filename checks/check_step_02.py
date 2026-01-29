@@ -1,11 +1,16 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Check for Step 02: Feed-forward Network (MLP)
 
 Validates that GPT2MLP is correctly implemented with proper structure.
 """
 
-import sys
 import inspect
+import sys
 from pathlib import Path
 
 # Add steps directory to path for imports
@@ -13,7 +18,7 @@ steps_dir = Path(__file__).parent.parent / "steps"
 sys.path.insert(0, str(steps_dir))
 
 
-def check_step_02():
+def check_step_02() -> bool:
     """Validate GPT2MLP implementation."""
     print("Running checks for Step 02: Feed-forward Network (MLP)...\n")
 
@@ -43,7 +48,7 @@ def check_step_02():
         return False
 
     # Check 2: Verify it has required attributes
-    required_attrs = ['c_fc', 'c_proj']
+    required_attrs = ["c_fc", "c_proj"]
     for attr in required_attrs:
         if not hasattr(mlp, attr):
             errors.append(f"GPT2MLP missing required attribute: {attr}")
@@ -51,20 +56,22 @@ def check_step_02():
             print(f"✅ GPT2MLP has attribute: {attr}")
 
     # Check 3: Verify forward method exists and has correct signature
-    if not hasattr(mlp, 'forward'):
+    if not hasattr(mlp, "forward"):
         errors.append("GPT2MLP missing forward method")
     else:
         sig = inspect.signature(mlp.forward)
         params = list(sig.parameters.keys())
-        if 'hidden_states' not in params:
-            errors.append("forward method should accept 'hidden_states' parameter")
+        if "hidden_states" not in params:
+            errors.append(
+                "forward method should accept 'hidden_states' parameter"
+            )
         else:
             print("✅ GPT2MLP has forward method with correct signature")
 
     # Check 4: Try a forward pass with dummy tensor
     try:
         from max.dtype import DType
-        from max.experimental.tensor import Tensor
+        from max.tensor import Tensor
 
         # Create dummy input [batch=1, seq_len=10, n_embd=768]
         dummy_input = Tensor.ones([1, 10, 768], dtype=DType.float32)
@@ -77,7 +84,9 @@ def check_step_02():
                 f"got {output.shape}"
             )
         else:
-            print(f"✅ Forward pass successful with correct output shape: {output.shape}")
+            print(
+                f"✅ Forward pass successful with correct output shape: {output.shape}"
+            )
     except Exception as e:
         errors.append(f"Forward pass failed: {e}")
 

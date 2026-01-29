@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Step 10: Text Generation
 
@@ -16,21 +21,23 @@ Run: pixi run s10
 # Hint: You'll need numpy as np
 # Hint: You'll need CPU from max.driver
 # Hint: You'll need DType from max.dtype
-# Hint: You'll need functional as F from max.experimental
-# Hint: You'll need Tensor from max.experimental.tensor
+# Hint: You'll need functional as F from max.nn
+# Hint: You'll need Tensor from max.tensor
 
-from step_09 import encode_text, decode_tokens
+from max.driver import Device
+from max.nn import Module
+from transformers import GPT2Tokenizer
 
 
 def generate_text(
-    model,
-    tokenizer,
-    device,
+    model: Module,
+    tokenizer: GPT2Tokenizer,
+    device: Device,
     prompt: str,
     max_new_tokens: int = 50,
     temperature: float = 0.8,
     do_sample: bool = True,
-):
+) -> str:
     """Generate text using the Max model.
 
     Args:
@@ -71,9 +78,12 @@ def generate_text(
     #     Create a temperature tensor with Tensor.constant()
     #     Divide next_token_logits by temperature
     #     Apply softmax: probs = F.softmax(next_token_logits)
-    #     Convert to numpy: probs_np = np.from_dlpack(probs.to(CPU()))
+    #     Convert to numpy with explicit type annotation: probs_np: np.ndarray = np.from_dlpack(probs.to(CPU()))
+    #     Ensure it's 1D: if probs_np.ndim > 1: probs_np = probs_np.flatten()
+    #     Convert to float for np.random.choice: probs_np = probs_np.astype(np.float64)
     #     Sample: next_token_id = np.random.choice(len(probs_np), p=probs_np)
-    #     Convert back to tensor: next_token_tensor = Tensor.constant(next_token_id, dtype=DType.int64, device=device)
+    #     Convert back to tensor: next_token_tensor = Tensor.constant(next_token_id, dtype=DType.int64, device=generated_tokens.device)
+    # Note: np.random.choice requires p to be a 1D float array
 
     # TODO: Use greedy decoding if not sampling
     # Hint: else: next_token_tensor = F.argmax(next_token_logits)

@@ -24,7 +24,7 @@ larger than all 12 transformer blocks combined.
 ## Understanding the projection
 
 The language model head performs a simple linear projection using MAX's
-[`Linear`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.module_v3.Linear)
+[`Linear`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.Linear)
 layer. It maps each 768-dimensional hidden state to 50,257 scores, one per
 vocabulary token.
 
@@ -45,7 +45,8 @@ With the LM head added, you now have the complete GPT-2 architecture:
 
 1. **Input**: Token IDs `[batch, seq_length]`
 2. **Embeddings**: Token + position `[batch, seq_length, 768]`
-3. **Transformer blocks**: 12 blocks process the embeddings `[batch, seq_length, 768]`
+3. **Transformer blocks**: 12 blocks process the embeddings
+   `[batch, seq_length, 768]`
 4. **Final layer norm**: Normalizes the output `[batch, seq_length, 768]`
 5. **LM head**: Projects to vocabulary `[batch, seq_length, 50257]`
 6. **Output**: Logits `[batch, seq_length, 50257]`
@@ -62,7 +63,8 @@ You'll use the following MAX operations to complete this task:
 
 **Linear layer**:
 
-- [`Linear(in_features, out_features, bias=False)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.module_v3.Linear): Projects hidden states to vocabulary logits
+- [`Linear(in_features, out_features, bias=False)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.Linear):
+  Projects hidden states to vocabulary logits
 
 </div>
 
@@ -89,7 +91,8 @@ In the `forward` method, implement a simple two-step process:
 2. Project to vocabulary logits: `logits = self.lm_head(hidden_states)`
 3. Return `logits`
 
-That's it. The model takes token IDs and returns logits. In the next step, you'll use these logits to generate text.
+That's it. The model takes token IDs and returns logits. In the next step,
+you'll use these logits to generate text.
 
 **Implementation** (`step_08.py`):
 
@@ -110,4 +113,5 @@ Run `pixi run s08` to verify your implementation.
 
 </details>
 
-**Next**: In [Step 09](./step_09.md), you'll implement tokenization functions to convert between text and token IDs. 
+**Next**: In [Step 09](./step_09.md), you'll implement tokenization functions to
+convert between text and token IDs.

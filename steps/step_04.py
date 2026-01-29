@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Step 04: Multi-head Attention
 
@@ -17,14 +22,13 @@ Run: pixi run s04
 
 # TODO: Import required modules
 # Hint: You'll need math for scaling
-# Hint: You'll need functional as F from max.experimental
-# Hint: You'll need Tensor, Device, DType from max.experimental.tensor and max.driver
+# Hint: You'll need functional as F from max.nn
+# Hint: You'll need Tensor, Device, DType from max.tensor and max.driver
 # Hint: You'll need Dim, DimLike from max.graph
-# Hint: You'll also need Linear and Module from max.nn.module_v3
+# Hint: You'll also need Linear and Module from max.nn
 
+from max.tensor import Tensor
 from step_01 import GPT2Config
-from step_03 import causal_mask
-
 
 # TODO: Copy causal_mask function from solution_02.py
 # This is the same function you implemented in Step 02
@@ -33,7 +37,7 @@ from step_03 import causal_mask
 class GPT2MultiHeadAttention(Module):
     """Multi-head attention for GPT-2."""
 
-    def __init__(self, config: GPT2Config):
+    def __init__(self, config: GPT2Config) -> None:
         super().__init__()
 
         self.embed_dim = config.n_embd
@@ -49,7 +53,9 @@ class GPT2MultiHeadAttention(Module):
         # Hint: Use Linear(self.embed_dim, self.embed_dim, bias=True)
         self.c_proj = None
 
-    def _split_heads(self, tensor, num_heads, attn_head_size):
+    def _split_heads(
+        self, tensor: Tensor, num_heads: int, attn_head_size: int
+    ) -> Tensor:
         """Split the last dimension into (num_heads, head_size).
 
         Args:
@@ -69,7 +75,9 @@ class GPT2MultiHeadAttention(Module):
         # Hint: return tensor.transpose(-3, -2)
         return None
 
-    def _merge_heads(self, tensor, num_heads, attn_head_size):
+    def _merge_heads(
+        self, tensor: Tensor, num_heads: int, attn_head_size: int
+    ) -> Tensor:
         """Merge attention heads back to original shape.
 
         Args:
@@ -89,7 +97,7 @@ class GPT2MultiHeadAttention(Module):
         # Hint: return tensor.reshape(new_shape)
         return None
 
-    def _attn(self, query, key, value):
+    def _attn(self, query: Tensor, key: Tensor, value: Tensor) -> Tensor:
         """Compute attention for all heads in parallel.
 
         Args:
@@ -109,7 +117,7 @@ class GPT2MultiHeadAttention(Module):
         # Hint: Weighted sum: attn_weights @ value
         return None
 
-    def forward(self, hidden_states):
+    def forward(self, hidden_states: Tensor) -> Tensor:
         """Apply multi-head attention.
 
         Args:

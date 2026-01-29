@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Solution for Step 05: Layer Normalization
 
@@ -5,10 +10,10 @@ This module implements layer normalization that normalizes activations
 across the embedding dimension for training stability.
 """
 
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
+import max.functional as F
 from max.graph import DimLike
-from max.nn.module_v3 import Module
+from max.nn import Module
+from max.tensor import Tensor
 
 
 class LayerNorm(Module):
@@ -19,7 +24,7 @@ class LayerNorm(Module):
         eps: Epsilon for numerical stability.
     """
 
-    def __init__(self, dim: DimLike, *, eps: float = 1e-5):
+    def __init__(self, dim: DimLike, *, eps: float = 1e-5) -> None:
         super().__init__()
         self.eps = eps
         self.weight = Tensor.ones([dim])
@@ -34,4 +39,6 @@ class LayerNorm(Module):
         Returns:
             Normalized tensor.
         """
-        return F.layer_norm(x, gamma=self.weight, beta=self.bias, epsilon=self.eps)
+        return F.layer_norm(
+            x, gamma=self.weight, beta=self.bias, epsilon=self.eps
+        )

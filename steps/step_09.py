@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Step 09: Encode and decode tokens
 
@@ -15,10 +20,16 @@ Run: pixi run s09
 # Hint: You'll need numpy as np
 # Hint: You'll need CPU from max.driver
 # Hint: You'll need DType from max.dtype
-# Hint: You'll need Tensor from max.experimental.tensor
+# Hint: You'll need Tensor from max.tensor
+
+from max.driver import Device
+from max.tensor import Tensor
+from transformers import GPT2Tokenizer
 
 
-def encode_text(text: str, tokenizer, device, max_length: int = 128):
+def encode_text(
+    text: str, tokenizer: GPT2Tokenizer, device: Device, max_length: int = 128
+) -> Tensor:
     """Tokenize text and convert to tensor.
 
     Args:
@@ -40,7 +51,7 @@ def encode_text(text: str, tokenizer, device, max_length: int = 128):
     return None
 
 
-def decode_tokens(token_ids: Tensor, tokenizer):
+def decode_tokens(token_ids: Tensor, tokenizer: GPT2Tokenizer) -> str:
     """Decode token IDs back to text.
 
     Args:
@@ -50,19 +61,21 @@ def decode_tokens(token_ids: Tensor, tokenizer):
     Returns:
         Decoded text string
     """
-    # TODO: Convert MAX tensor to NumPy
-    # Hint: Move to CPU first with token_ids.to(CPU())
-    # Hint: Then convert with np.from_dlpack(...)
+    # TODO: Convert MAX tensor to NumPy array explicitly
+    # Hint: Create a new variable with type annotation: token_ids_np: np.ndarray
+    # Hint: token_ids_np = np.from_dlpack(token_ids.to(CPU()))
+    # Note: This makes the type conversion from Tensor to np.ndarray explicit
     pass
 
     # TODO: Flatten if needed
-    # Hint: if token_ids.ndim > 1: token_ids = token_ids.flatten()
+    # Hint: if token_ids_np.ndim > 1: token_ids_np = token_ids_np.flatten()
     pass
 
-    # TODO: Convert to Python list
-    # Hint: token_ids = token_ids.tolist()
+    # TODO: Convert to Python list explicitly
+    # Hint: Create a new variable: token_ids_list: list = token_ids_np.tolist()
+    # Note: This makes the conversion from np.ndarray to list explicit
     pass
 
     # TODO: Decode to text
-    # Hint: return tokenizer.decode(token_ids, skip_special_tokens=True)
+    # Hint: return tokenizer.decode(token_ids_list, skip_special_tokens=True)
     return None

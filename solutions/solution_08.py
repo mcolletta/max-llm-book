@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Solution for Step 08: Language Model Head
 
@@ -5,10 +10,10 @@ This module adds the final projection layer that converts hidden states
 to vocabulary logits for predicting the next token.
 """
 
-from max.nn.module_v3 import Linear, Module
-
-from solution_01 import GPT2Config
-from solution_07 import MaxGPT2Model
+from max.nn import Linear, Module
+from max.tensor import Tensor
+from step_01 import GPT2Config
+from step_07 import MaxGPT2Model
 
 
 class MaxGPT2LMHeadModel(Module):
@@ -17,7 +22,7 @@ class MaxGPT2LMHeadModel(Module):
     This is the full model that can be used for text generation.
     """
 
-    def __init__(self, config: GPT2Config):
+    def __init__(self, config: GPT2Config) -> None:
         """Initialize GPT-2 with LM head.
 
         Args:
@@ -31,7 +36,7 @@ class MaxGPT2LMHeadModel(Module):
         # Language modeling head (hidden states -> vocabulary logits)
         self.lm_head = Linear(config.n_embd, config.vocab_size, bias=False)
 
-    def forward(self, input_ids):
+    def forward(self, input_ids: Tensor) -> Tensor:
         """Forward pass through transformer and LM head.
 
         Args:

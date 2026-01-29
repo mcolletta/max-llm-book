@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Check for Step 05: Layer Normalization
 
@@ -5,7 +10,6 @@ Validates that LayerNorm is correctly implemented.
 """
 
 import sys
-import inspect
 from pathlib import Path
 
 # Add steps directory to path for imports
@@ -13,7 +17,7 @@ steps_dir = Path(__file__).parent.parent / "steps"
 sys.path.insert(0, str(steps_dir))
 
 
-def check_step_05():
+def check_step_05() -> bool:
     """Validate LayerNorm implementation."""
     print("Running checks for Step 05: Layer Normalization...\n")
 
@@ -41,7 +45,7 @@ def check_step_05():
         return False
 
     # Check 2: Verify required attributes
-    required_attrs = ['weight', 'bias', 'eps']
+    required_attrs = ["weight", "bias", "eps"]
     for attr in required_attrs:
         if not hasattr(ln, attr):
             errors.append(f"LayerNorm missing attribute: {attr}")
@@ -49,32 +53,38 @@ def check_step_05():
             print(f"✅ Has attribute: {attr}")
 
     # Check 3: Verify weight and bias shapes
-    if hasattr(ln, 'weight'):
-        from max.experimental.tensor import Tensor
+    if hasattr(ln, "weight"):
+        from max.tensor import Tensor
+
         if not isinstance(ln.weight, Tensor):
             errors.append(f"weight should be a Tensor, got {type(ln.weight)}")
         else:
             expected_shape = (768,)
             actual_shape = tuple(int(dim) for dim in ln.weight.shape)
             if actual_shape != expected_shape:
-                errors.append(f"weight shape should be {expected_shape}, got {actual_shape}")
+                errors.append(
+                    f"weight shape should be {expected_shape}, got {actual_shape}"
+                )
             else:
                 print(f"✅ weight has correct shape: {actual_shape}")
 
-    if hasattr(ln, 'bias'):
-        from max.experimental.tensor import Tensor
+    if hasattr(ln, "bias"):
+        from max.tensor import Tensor
+
         if not isinstance(ln.bias, Tensor):
             errors.append(f"bias should be a Tensor, got {type(ln.bias)}")
         else:
             expected_shape = (768,)
             actual_shape = tuple(int(dim) for dim in ln.bias.shape)
             if actual_shape != expected_shape:
-                errors.append(f"bias shape should be {expected_shape}, got {actual_shape}")
+                errors.append(
+                    f"bias shape should be {expected_shape}, got {actual_shape}"
+                )
             else:
                 print(f"✅ bias has correct shape: {actual_shape}")
 
     # Check 4: Verify forward method
-    if not hasattr(ln, 'forward'):
+    if not hasattr(ln, "forward"):
         errors.append("LayerNorm missing forward method")
     else:
         print("✅ Has forward method")
@@ -82,7 +92,7 @@ def check_step_05():
     # Check 5: Try a forward pass
     try:
         from max.dtype import DType
-        from max.experimental.tensor import Tensor
+        from max.tensor import Tensor
 
         dummy_input = Tensor.ones([1, 10, 768], dtype=DType.float32)
         output = ln(dummy_input)
@@ -90,7 +100,9 @@ def check_step_05():
         expected_shape = tuple(int(dim) for dim in dummy_input.shape)
         actual_shape = tuple(int(dim) for dim in output.shape)
         if actual_shape != expected_shape:
-            errors.append(f"Output shape mismatch: expected {expected_shape}, got {actual_shape}")
+            errors.append(
+                f"Output shape mismatch: expected {expected_shape}, got {actual_shape}"
+            )
         else:
             print(f"✅ Forward pass successful with shape: {actual_shape}")
     except Exception as e:

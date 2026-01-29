@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Step 11: Load Weights and Run Model
 
@@ -13,18 +18,8 @@ Tasks:
 Run: pixi run s11
 """
 
-from max.dtype import DType
-from max.experimental.tensor import Tensor, TensorType, defaults
-from max.graph import DeviceRef
-from max.nn.module_v3 import Linear
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
-from step_01 import GPT2Config
-from step_08 import MaxGPT2LMHeadModel
-from step_10 import generate_text
-
-
-def run_model():
+def run_model() -> None:
     """Load GPT-2 model, compile it, and run interactive text generation."""
 
     # TODO: Load HuggingFace model

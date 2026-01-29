@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Check for Step 06: Transformer Block
 
@@ -12,7 +17,7 @@ steps_dir = Path(__file__).parent.parent / "steps"
 sys.path.insert(0, str(steps_dir))
 
 
-def check_step_06():
+def check_step_06() -> bool:
     """Validate GPT2Block implementation."""
     print("Running checks for Step 06: Transformer Block...\n")
 
@@ -42,7 +47,7 @@ def check_step_06():
         return False
 
     # Check 2: Verify required attributes
-    required_attrs = ['ln_1', 'attn', 'ln_2', 'mlp']
+    required_attrs = ["ln_1", "attn", "ln_2", "mlp"]
     for attr in required_attrs:
         if not hasattr(block, attr):
             errors.append(f"GPT2Block missing attribute: {attr}")
@@ -50,7 +55,7 @@ def check_step_06():
             print(f"✅ Has attribute: {attr}")
 
     # Check 3: Verify forward method
-    if not hasattr(block, 'forward'):
+    if not hasattr(block, "forward"):
         errors.append("GPT2Block missing forward method")
     else:
         print("✅ Has forward method")
@@ -58,13 +63,15 @@ def check_step_06():
     # Check 4: Try a forward pass
     try:
         from max.dtype import DType
-        from max.experimental.tensor import Tensor
+        from max.tensor import Tensor
 
         dummy_input = Tensor.ones([1, 10, 768], dtype=DType.float32)
         output = block(dummy_input)
 
         if output.shape != dummy_input.shape:
-            errors.append(f"Output shape mismatch: expected {dummy_input.shape}, got {output.shape}")
+            errors.append(
+                f"Output shape mismatch: expected {dummy_input.shape}, got {output.shape}"
+            )
         else:
             print(f"✅ Forward pass successful with shape: {output.shape}")
     except Exception as e:

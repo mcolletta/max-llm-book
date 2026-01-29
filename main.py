@@ -1,19 +1,26 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 import math
+from collections.abc import Callable
 from dataclasses import dataclass
-import numpy as np
-from transformers import GPT2LMHeadModel, GPT2Tokenizer, GenerationConfig
+from typing import cast
 
-from max.driver import Device, CPU
+import max.functional as F
+import numpy as np
+from max.driver import CPU, Device
 from max.dtype import DType
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor, TensorType, defaults
-from max.graph import Dim, DimLike, DeviceRef
-from max.nn.module_v3 import (
+from max.graph import DeviceRef, Dim, DimLike, TensorValue
+from max.nn import (
     Embedding,
     Linear,
     Module,
     Sequential,
 )
+from max.tensor import Tensor, TensorType, defaults
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 
 # ANCHOR: model_configuration
@@ -21,13 +28,13 @@ from max.nn.module_v3 import (
 class GPT2Config:
     """GPT-2 configuration matching HuggingFace"""
 
-    vocab_size = 50257
-    n_positions = 1024
-    n_embd = 768
-    n_layer = 12
-    n_head = 12
-    n_inner = None
-    layer_norm_epsilon = 1e-5
+    vocab_size: int = 50257
+    n_positions: int = 1024
+    n_embd: int = 768
+    n_layer: int = 12
+    n_head: int = 12
+    n_inner: int | None = None
+    layer_norm_epsilon: float = 1e-5
 
 
 # ANCHOR_END: model_configuration
@@ -37,13 +44,13 @@ class GPT2Config:
 class GPT2MLP(Module):
     """Exact HuggingFace GPT-2 MLP structure"""
 
-    def __init__(self, intermediate_size, config):
+    def __init__(self, intermediate_size: int, config: GPT2Config) -> None:
         super().__init__()
         embed_dim = config.n_embd
         self.c_fc = Linear(embed_dim, intermediate_size, bias=True)
         self.c_proj = Linear(intermediate_size, embed_dim, bias=True)
 
-    def forward(self, hidden_states):
+    def forward(self, hidden_states: Tensor) -> Tensor:
         hidden_states = self.c_fc(hidden_states)
         hidden_states = F.gelu(hidden_states, approximate="tanh")
         hidden_states = self.c_proj(hidden_states)
@@ -61,7 +68,7 @@ def causal_mask(
     *,
     dtype: DType,
     device: Device,
-):
+) -> Tensor:
     n = Dim(sequence_length) + num_tokens
     mask = Tensor.constant(float("-inf"), dtype=dtype, device=device)
     mask = F.broadcast_to(mask, shape=(sequence_length, n))
@@ -75,7 +82,7 @@ def causal_mask(
 class GPT2MultiHeadAttention(Module):
     """Exact HuggingFace GPT-2 attention structure"""
 
-    def __init__(self, config):
+    def __init__(self, config: GPT2Config) -> None:
         super().__init__()
         self.embed_dim = config.n_embd
         self.num_heads = config.n_head
@@ -85,7 +92,12 @@ class GPT2MultiHeadAttention(Module):
         self.c_attn = Linear(self.embed_dim, 3 * self.embed_dim, bias=True)
         self.c_proj = Linear(self.embed_dim, self.embed_dim, bias=True)
 
-    def _attn(self, query, key, value):
+    def _attn(
+        self,
+        query: Tensor | TensorValue,
+        key: Tensor | TensorValue,
+        value: Tensor | TensorValue,
+    ) -> Tensor | TensorValue:
         attn_weights = query @ key.transpose(-1, -2)
 
         # Scale attention weights
@@ -101,34 +113,45 @@ class GPT2MultiHeadAttention(Module):
 
         return attn_output
 
-    def _split_heads(self, tensor, num_heads, attn_head_size):
+    def _split_heads(
+        self, tensor: Tensor | TensorValue, num_heads: int, attn_head_size: int
+    ) -> Tensor | TensorValue:
         """Split the last dimension into (num_heads, head_size)"""
-        new_shape = tensor.shape[:-1] + [num_heads, attn_head_size]
+        new_shape = list(tensor.shape[:-1]) + [num_heads, attn_head_size]
         tensor = tensor.reshape(new_shape)
-        return tensor.transpose(-3, -2)  # (batch, head, seq_length, head_features)
+        return tensor.transpose(
+            -3, -2
+        )  # (batch, head, seq_length, head_features)
 
-    def _merge_heads(self, tensor, num_heads, attn_head_size):
+    def _merge_heads(
+        self, tensor: Tensor | TensorValue, num_heads: int, attn_head_size: int
+    ) -> Tensor | TensorValue:
         """Merge attention heads back"""
         tensor = tensor.transpose(-3, -2)
-        new_shape = tensor.shape[:-2] + [num_heads * attn_head_size]
+        new_shape = list(tensor.shape[:-2]) + [num_heads * attn_head_size]
         return tensor.reshape(new_shape)
 
-    def forward(self, hidden_states):
-        query, key, value = F.split(
+    def forward(self, hidden_states: Tensor) -> Tensor:
+        split_result = F.split(
             self.c_attn(hidden_states),
             [self.split_size, self.split_size, self.split_size],
             axis=2,
         )
+        query = cast(Tensor | TensorValue, split_result[0])
+        key = cast(Tensor | TensorValue, split_result[1])
+        value = cast(Tensor | TensorValue, split_result[2])
 
         query = self._split_heads(query, self.num_heads, self.head_dim)
         key = self._split_heads(key, self.num_heads, self.head_dim)
         value = self._split_heads(value, self.num_heads, self.head_dim)
 
         attn_output = self._attn(query, key, value)
-        attn_output = self._merge_heads(attn_output, self.num_heads, self.head_dim)
-        attn_output = self.c_proj(attn_output)
+        attn_output = self._merge_heads(
+            attn_output, self.num_heads, self.head_dim
+        )
+        attn_output = self.c_proj(cast(Tensor, attn_output))
 
-        return attn_output
+        return cast(Tensor, attn_output)
 
 
 # ANCHOR_END: multi_head_attention
@@ -136,13 +159,15 @@ class GPT2MultiHeadAttention(Module):
 
 # ANCHOR: layer_normalization
 class LayerNorm(Module):
-    def __init__(self, dim: DimLike, *, eps: float = 1e-5):
+    def __init__(self, dim: DimLike, *, eps: float = 1e-5) -> None:
         self.eps = eps
         self.weight = Tensor.ones([dim])
         self.bias = Tensor.zeros([dim])
 
     def forward(self, x: Tensor) -> Tensor:
-        return F.layer_norm(x, gamma=self.weight, beta=self.bias, epsilon=self.eps)
+        return F.layer_norm(
+            x, gamma=self.weight, beta=self.bias, epsilon=self.eps
+        )
 
 
 # ANCHOR_END: layer_normalization
@@ -152,7 +177,7 @@ class LayerNorm(Module):
 class GPT2Block(Module):
     """Exact HuggingFace GPT-2 transformer block structure"""
 
-    def __init__(self, config):
+    def __init__(self, config: GPT2Config) -> None:
         super().__init__()
         hidden_size = config.n_embd
         inner_dim = (
@@ -166,7 +191,7 @@ class GPT2Block(Module):
         self.ln_2 = LayerNorm(hidden_size, eps=config.layer_norm_epsilon)
         self.mlp = GPT2MLP(inner_dim, config)
 
-    def forward(self, hidden_states):
+    def forward(self, hidden_states: Tensor) -> Tensor:
         residual = hidden_states
         hidden_states = self.ln_1(hidden_states)
         attn_output = self.attn(hidden_states)
@@ -188,17 +213,19 @@ class MaxGPT2Model(Module):
     def __init__(
         self,
         config: GPT2Config,
-    ):
+    ) -> None:
         self.wte = Embedding(config.vocab_size, dim=config.n_embd)
         self.wpe = Embedding(config.n_positions, dim=config.n_embd)
         self.h = Sequential(*(GPT2Block(config) for _ in range(config.n_layer)))
         self.ln_f = LayerNorm(config.n_embd, eps=config.layer_norm_epsilon)
 
-    def forward(self, input_ids):
-        batch_size, seq_length = input_ids.shape
+    def forward(self, input_ids: Tensor) -> Tensor:
+        _, seq_length = input_ids.shape
         tok_embeds = self.wte(input_ids)
         pos_embeds = self.wpe(
-            Tensor.arange(seq_length, dtype=input_ids.dtype, device=input_ids.device)
+            Tensor.arange(
+                seq_length, dtype=input_ids.dtype, device=input_ids.device
+            )
         )
         x = tok_embeds + pos_embeds
         x = self.h(x)
@@ -213,13 +240,13 @@ class MaxGPT2Model(Module):
 class MaxGPT2LMHeadModel(Module):
     """Exact HuggingFace GPT-2 model structure"""
 
-    def __init__(self, config):
+    def __init__(self, config: GPT2Config) -> None:
         super().__init__()
         self.config = config
         self.transformer = MaxGPT2Model(config)
         self.lm_head = Linear(config.n_embd, config.vocab_size, bias=False)
 
-    def forward(self, input_ids):
+    def forward(self, input_ids: Tensor) -> Tensor:
         input_ids = self.transformer(input_ids)
         return self.lm_head(input_ids)
 
@@ -228,19 +255,22 @@ class MaxGPT2LMHeadModel(Module):
 
 
 # ANCHOR: encode_and_decode
-def encode_text(text: str, tokenizer, device, max_length: int = 128):
+def encode_text(
+    text: str, tokenizer: GPT2Tokenizer, device: Device, max_length: int = 128
+) -> Tensor:
     """Tokenize text and convert to tensor."""
     token_ids = tokenizer.encode(text, max_length=max_length, truncation=True)
     return Tensor.constant([token_ids], dtype=DType.int64, device=device)
 
 
-def decode_tokens(token_ids: Tensor, tokenizer):
+def decode_tokens(token_ids: Tensor, tokenizer: GPT2Tokenizer) -> str:
     """Decode token IDs back to text."""
-    token_ids = np.from_dlpack(token_ids.to(CPU()))
-    if token_ids.ndim > 1:
-        token_ids = token_ids.flatten()
-    token_ids = token_ids.tolist()
-    return tokenizer.decode(token_ids, skip_special_tokens=True)
+    # Explicitly convert Tensor to numpy array via CPU
+    token_ids_np: np.ndarray = np.from_dlpack(token_ids.to(CPU()))
+    if token_ids_np.ndim > 1:
+        token_ids_np = token_ids_np.flatten()
+    token_ids_list: list = token_ids_np.tolist()
+    return tokenizer.decode(token_ids_list, skip_special_tokens=True)
 
 
 # ANCHOR_END: encode_and_decode
@@ -248,14 +278,14 @@ def decode_tokens(token_ids: Tensor, tokenizer):
 
 # ANCHOR: text_generation
 def generate_text(
-    model,
-    tokenizer,
-    device,
+    model: Module | Callable[[Tensor], Tensor],
+    tokenizer: GPT2Tokenizer,
+    device: Device,
     prompt: str,
     max_new_tokens: int = 50,
     temperature: float = 0.8,
     do_sample: bool = True,
-):
+) -> str:
     """Generate text using the Max model."""
     generated_tokens = encode_text(prompt, tokenizer, device, max_length=100)
 
@@ -280,7 +310,11 @@ def generate_text(
             probs = F.softmax(next_token_logits)
 
             # Convert to numpy for actual sampling
-            probs_np = np.from_dlpack(probs.to(CPU()))
+            # Explicitly convert to 1D float array for np.random.choice
+            probs_np: np.ndarray = np.from_dlpack(probs.to(CPU()))
+            if probs_np.ndim > 1:
+                probs_np = probs_np.flatten()
+            probs_np = probs_np.astype(np.float64)
             next_token_id = np.random.choice(len(probs_np), p=probs_np)
             next_token_tensor = Tensor.constant(
                 next_token_id, dtype=DType.int64, device=generated_tokens.device
@@ -305,7 +339,7 @@ def generate_text(
 
 
 # ANCHOR: load_weights_and_run_model
-def main():
+def main() -> None:
     # Load HuggingFace model
     hf_model = GPT2LMHeadModel.from_pretrained("gpt2")
     print(f"Loaded HuggingFace model:\n{hf_model}")
@@ -325,7 +359,10 @@ def main():
     max_model.to(device)
     for name, child in max_model.descendants:
         if isinstance(child, Linear):
-            if any(layer_name in name for layer_name in ["c_attn", "c_proj", "c_fc"]):
+            if any(
+                layer_name in name
+                for layer_name in ["c_attn", "c_proj", "c_fc"]
+            ):
                 print(f"Transposing {name}: {child.weight.shape}")
                 # The upstream model has conv1d layers instead of linear, which have their weights
                 # stored transposed compared to linear

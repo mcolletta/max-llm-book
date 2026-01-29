@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Check for Step 07: Stacking Transformer Blocks
 
@@ -12,7 +17,7 @@ steps_dir = Path(__file__).parent.parent / "steps"
 sys.path.insert(0, str(steps_dir))
 
 
-def check_step_07():
+def check_step_07() -> bool:
     """Validate MaxGPT2Model implementation."""
     print("Running checks for Step 07: Stacking Transformer Blocks...\n")
 
@@ -42,7 +47,7 @@ def check_step_07():
         return False
 
     # Check 2: Verify required attributes
-    required_attrs = ['wte', 'wpe', 'h', 'ln_f']
+    required_attrs = ["wte", "wpe", "h", "ln_f"]
     for attr in required_attrs:
         if not hasattr(model, attr):
             errors.append(f"MaxGPT2Model missing attribute: {attr}")
@@ -50,18 +55,20 @@ def check_step_07():
             print(f"✅ Has attribute: {attr}")
 
     # Check 3: Verify embeddings
-    if hasattr(model, 'wte'):
-        from max.nn.module_v3 import Embedding
+    if hasattr(model, "wte"):
+        from max.nn import Embedding
+
         if not isinstance(model.wte, Embedding):
             errors.append(f"wte should be an Embedding, got {type(model.wte)}")
 
-    if hasattr(model, 'wpe'):
-        from max.nn.module_v3 import Embedding
+    if hasattr(model, "wpe"):
+        from max.nn import Embedding
+
         if not isinstance(model.wpe, Embedding):
             errors.append(f"wpe should be an Embedding, got {type(model.wpe)}")
 
     # Check 4: Verify forward method
-    if not hasattr(model, 'forward'):
+    if not hasattr(model, "forward"):
         errors.append("MaxGPT2Model missing forward method")
     else:
         print("✅ Has forward method")
@@ -69,16 +76,20 @@ def check_step_07():
     # Check 5: Try a forward pass
     try:
         from max.dtype import DType
-        from max.experimental.tensor import Tensor
+        from max.tensor import Tensor
 
         # Create dummy token IDs [batch=1, seq_len=10]
-        dummy_input = Tensor.constant([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], dtype=DType.int64)
+        dummy_input = Tensor.constant(
+            [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], dtype=DType.int64
+        )
         output = model(dummy_input)
 
         expected_shape = (1, 10, 768)  # [batch, seq_len, n_embd]
         actual_shape = tuple(int(dim) for dim in output.shape)
         if actual_shape != expected_shape:
-            errors.append(f"Output shape mismatch: expected {expected_shape}, got {actual_shape}")
+            errors.append(
+                f"Output shape mismatch: expected {expected_shape}, got {actual_shape}"
+            )
         else:
             print(f"✅ Forward pass successful with shape: {actual_shape}")
     except Exception as e:

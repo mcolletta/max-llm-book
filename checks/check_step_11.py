@@ -1,11 +1,16 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Check for Step 11: Load Weights and Run Model
 
 Validates that run_model function is correctly implemented.
 """
 
-import sys
 import inspect
+import sys
 from pathlib import Path
 
 # Add steps directory to path for imports
@@ -13,7 +18,7 @@ steps_dir = Path(__file__).parent.parent / "steps"
 sys.path.insert(0, str(steps_dir))
 
 
-def check_step_11():
+def check_step_11() -> bool:
     """Validate run_model implementation."""
     print("Running checks for Step 11: Load Weights and Run Model...\n")
 
@@ -37,9 +42,15 @@ def check_step_11():
     # Check 2: Verify function signature
     sig = inspect.signature(run_model)
     # run_model should take no required arguments
-    required_params = [p for p in sig.parameters.values() if p.default == inspect.Parameter.empty]
+    required_params = [
+        p
+        for p in sig.parameters.values()
+        if p.default == inspect.Parameter.empty
+    ]
     if len(required_params) > 0:
-        errors.append(f"run_model should not have required parameters, found: {[p.name for p in required_params]}")
+        errors.append(
+            f"run_model should not have required parameters, found: {[p.name for p in required_params]}"
+        )
     else:
         print("✅ run_model has correct signature (no required parameters)")
 
@@ -47,22 +58,25 @@ def check_step_11():
     # We can't run it without user interaction, but we can check the source
     try:
         import inspect as insp
+
         source = insp.getsource(run_model)
 
         # Check for key components in the source
         required_components = [
-            ('GPT2LMHeadModel', 'Loading HuggingFace model'),
-            ('GPT2Tokenizer', 'Initializing tokenizer'),
-            ('from_pretrained', 'Using from_pretrained method'),
-            ('compile', 'Compiling the model'),
-            ('generate_text', 'Calling generate_text function'),
+            ("GPT2LMHeadModel", "Loading HuggingFace model"),
+            ("GPT2Tokenizer", "Initializing tokenizer"),
+            ("from_pretrained", "Using from_pretrained method"),
+            ("compile", "Compiling the model"),
+            ("generate_text", "Calling generate_text function"),
         ]
 
         for component, description in required_components:
             if component in source:
                 print(f"✅ Function contains: {description}")
             else:
-                errors.append(f"Function missing: {description} ('{component}' not found in source)")
+                errors.append(
+                    f"Function missing: {description} ('{component}' not found in source)"
+                )
 
     except Exception as e:
         errors.append(f"Failed to analyze function source: {e}")
@@ -77,7 +91,9 @@ def check_step_11():
         return False
 
     print("🎉 All checks passed for Step 11!")
-    print("Note: Full testing requires running the interactive model (use: pixi run gpt2)")
+    print(
+        "Note: Full testing requires running the interactive model (use: pixi run gpt2)"
+    )
     return True
 
 

@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Solution for Step 07: Stacking Transformer Blocks
 
@@ -5,12 +10,11 @@ This module stacks multiple transformer blocks and adds embeddings
 to create the complete GPT-2 transformer architecture.
 """
 
-from max.experimental.tensor import Tensor
-from max.nn.module_v3 import Embedding, Module, Sequential
-
-from solution_01 import GPT2Config
-from solution_05 import LayerNorm
-from solution_06 import GPT2Block
+from max.nn import Embedding, Module, Sequential
+from max.tensor import Tensor
+from step_01 import GPT2Config
+from step_05 import LayerNorm
+from step_06 import GPT2Block
 
 
 class MaxGPT2Model(Module):
@@ -22,7 +26,7 @@ class MaxGPT2Model(Module):
     3. Final layer normalization
     """
 
-    def __init__(self, config: GPT2Config):
+    def __init__(self, config: GPT2Config) -> None:
         """Initialize GPT-2 model.
 
         Args:
@@ -41,7 +45,7 @@ class MaxGPT2Model(Module):
         # Final layer normalization
         self.ln_f = LayerNorm(config.n_embd, eps=config.layer_norm_epsilon)
 
-    def forward(self, input_ids):
+    def forward(self, input_ids: Tensor) -> Tensor:
         """Forward pass through the transformer.
 
         Args:
@@ -50,14 +54,16 @@ class MaxGPT2Model(Module):
         Returns:
             Hidden states, shape [batch, seq_length, n_embd]
         """
-        batch_size, seq_length = input_ids.shape
+        _, seq_length = input_ids.shape
 
         # Get token embeddings
         tok_embeds = self.wte(input_ids)
 
         # Get position embeddings
         pos_embeds = self.wpe(
-            Tensor.arange(seq_length, dtype=input_ids.dtype, device=input_ids.device)
+            Tensor.arange(
+                seq_length, dtype=input_ids.dtype, device=input_ids.device
+            )
         )
 
         # Combine embeddings

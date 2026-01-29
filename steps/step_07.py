@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Step 07: Stacking Transformer Blocks
 
@@ -15,18 +20,17 @@ Run: pixi run s10
 """
 
 # TODO: Import required modules
-# Hint: You'll need Tensor from max.experimental.tensor
-# Hint: You'll need Embedding, Module, Sequential from max.nn.module_v3
+# Hint: You'll need Tensor from max.tensor
+# Hint: You'll need Embedding, Module, Sequential from max.nn
 
+from max.tensor import Tensor
 from step_01 import GPT2Config
-from step_05 import LayerNorm
-from step_06 import GPT2Block
 
 
 class MaxGPT2Model(Module):
     """Complete GPT-2 transformer model."""
 
-    def __init__(self, config: GPT2Config):
+    def __init__(self, config: GPT2Config) -> None:
         """Initialize GPT-2 model.
 
         Args:
@@ -51,7 +55,7 @@ class MaxGPT2Model(Module):
         # Hint: Use LayerNorm(config.n_embd, eps=config.layer_norm_epsilon)
         self.ln_f = None
 
-    def forward(self, input_ids):
+    def forward(self, input_ids: Tensor) -> Tensor:
         """Forward pass through the transformer.
 
         Args:

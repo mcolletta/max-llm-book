@@ -1,5 +1,9 @@
-"""
-Solution for Step 01: Model Configuration
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
+"""Solution for Step 01: Model Configuration
 
 This module implements the GPT-2 configuration dataclass that stores
 hyperparameters matching HuggingFace's GPT-2 model structure.

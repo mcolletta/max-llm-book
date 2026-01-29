@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Step 08: Language Model Head
 
@@ -12,15 +17,16 @@ Run: pixi run s08
 """
 
 # TODO: Import required modules
-# Hint: You'll need Linear and Module from max.nn.module_v3
+# Hint: You'll need Linear and Module from max.nn
 
+from max.tensor import Tensor
 from step_01 import GPT2Config
-from step_07 import MaxGPT2Model
+
 
 class MaxGPT2LMHeadModel(Module):
     """Complete GPT-2 model with language modeling head."""
 
-    def __init__(self, config: GPT2Config):
+    def __init__(self, config: GPT2Config) -> None:
         """Initialize GPT-2 with LM head.
 
         Args:
@@ -39,7 +45,7 @@ class MaxGPT2LMHeadModel(Module):
         # Projects from hidden dimension to vocabulary size
         self.lm_head = None
 
-    def forward(self, input_ids):
+    def forward(self, input_ids: Tensor) -> Tensor:
         """Forward pass through transformer and LM head.
 
         Args:

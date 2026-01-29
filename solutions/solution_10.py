@@ -1,30 +1,35 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Solution for Step 10: Text Generation
 
 This module implements autoregressive text generation using the GPT-2 model.
 """
 
+import max.functional as F
 import numpy as np
-
-from max.driver import CPU
+from max.driver import CPU, Device
 from max.dtype import DType
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
-
-from solution_09 import tokenize_text, decode_tokens
+from max.nn import Module
+from max.tensor import Tensor
+from step_09 import decode_tokens, encode_text
+from transformers import GPT2Tokenizer
 
 
 def generate_text(
-    model,
-    tokenizer,
-    device,
+    model: Module,
+    tokenizer: GPT2Tokenizer,
+    device: Device,
     prompt: str,
     max_new_tokens: int = 50,
     temperature: float = 0.8,
     do_sample: bool = True,
-):
+) -> str:
     """Generate text using the Max model."""
-    generated_tokens = tokenize_text(prompt, tokenizer, device, max_length=100)
+    generated_tokens = encode_text(prompt, tokenizer, device, max_length=100)
 
     print(f"Starting generation from: '{prompt}'")
     print(
@@ -47,7 +52,11 @@ def generate_text(
             probs = F.softmax(next_token_logits)
 
             # Convert to numpy for actual sampling
-            probs_np = np.from_dlpack(probs.to(CPU()))
+            # Explicitly convert to 1D float array for np.random.choice
+            probs_np: np.ndarray = np.from_dlpack(probs.to(CPU()))
+            if probs_np.ndim > 1:
+                probs_np = probs_np.flatten()
+            probs_np = probs_np.astype(np.float64)
             next_token_id = np.random.choice(len(probs_np), p=probs_np)
             next_token_tensor = Tensor.constant(
                 next_token_id, dtype=DType.int64, device=generated_tokens.device

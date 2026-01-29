@@ -1,19 +1,23 @@
-"""
-Check for Step 01: Model Configuration
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
+"""Check for Step 01: Model Configuration
 
 Validates that GPT2Config dataclass is correctly implemented with proper values.
 """
 
 import sys
-from pathlib import Path
 from dataclasses import is_dataclass
+from pathlib import Path
 
 # Add steps directory to path for imports
 steps_dir = Path(__file__).parent.parent / "steps"
 sys.path.insert(0, str(steps_dir))
 
 
-def check_step_01():
+def check_step_01() -> bool:
     """Validate GPT2Config implementation."""
     print("Running checks for Step 01: Model Configuration...\n")
 
@@ -29,7 +33,9 @@ def check_step_01():
 
     # Check 1: Is it a dataclass?
     if not is_dataclass(GPT2Config):
-        errors.append("GPT2Config must be a dataclass (use @dataclass decorator)")
+        errors.append(
+            "GPT2Config must be a dataclass (use @dataclass decorator)"
+        )
     else:
         print("✅ GPT2Config is a dataclass")
 
@@ -48,13 +54,13 @@ def check_step_01():
 
     # Check 3: Validate field values match HuggingFace GPT-2
     expected_values = {
-        'vocab_size': 50257,
-        'n_positions': 1024,
-        'n_embd': 768,
-        'n_layer': 12,
-        'n_head': 12,
-        'n_inner': 3072,  # 4 * n_embd
-        'layer_norm_epsilon': 1e-5,
+        "vocab_size": 50257,
+        "n_positions": 1024,
+        "n_embd": 768,
+        "n_layer": 12,
+        "n_head": 12,
+        "n_inner": 3072,  # 4 * n_embd
+        "layer_norm_epsilon": 1e-5,
     }
 
     for field_name, expected_value in expected_values.items():
@@ -72,13 +78,13 @@ def check_step_01():
 
     # Check 4: Validate field types
     expected_types = {
-        'vocab_size': int,
-        'n_positions': int,
-        'n_embd': int,
-        'n_layer': int,
-        'n_head': int,
-        'n_inner': int,
-        'layer_norm_epsilon': float,
+        "vocab_size": int,
+        "n_positions": int,
+        "n_embd": int,
+        "n_layer": int,
+        "n_head": int,
+        "n_inner": int,
+        "layer_norm_epsilon": float,
     }
 
     for field_name, expected_type in expected_types.items():

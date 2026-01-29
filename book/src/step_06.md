@@ -7,7 +7,7 @@ into a complete transformer block.
 
 </div>
 
-In this step, you'll build a GPT-2 transformer block in the `GPT2Block` class. 
+In this step, you'll build a GPT-2 transformer block in the `GPT2Block` class.
 The transformer block is the definitive feature of GPT-2 and any other transformer
 model. It includes a series of self-attention layers (the multi-head attention block),
 a simple feed-forward network (the MLP block), and layer normalization—all of which
@@ -27,13 +27,17 @@ through the network's 12 stacked blocks.
 
 The transformer block consists of four components, applied in this order:
 
-**First layer norm (`ln_1`)**: Normalizes the input before attention. Uses epsilon=1e-5 for numerical stability.
+**First layer norm (`ln_1`)**: Normalizes the input before attention. Uses
+epsilon=1e-5 for numerical stability.
 
-**Multi-head attention (`attn`)**: The self-attention mechanism from Step 04. Lets each position attend to all previous positions.
+**Multi-head attention (`attn`)**: The self-attention mechanism from Step 04.
+Lets each position attend to all previous positions.
 
-**Second layer norm (`ln_2`)**: Normalizes before the MLP. Same configuration as the first.
+**Second layer norm (`ln_2`)**: Normalizes before the MLP. Same configuration as
+the first.
 
-**Feed-forward network (`mlp`)**: The position-wise MLP from Step 02. Expands to 3,072 dimensions internally (4× the embedding size), then projects back to 768.
+**Feed-forward network (`mlp`)**: The position-wise MLP from Step 02. Expands to
+3,072 dimensions internally (4× the embedding size), then projects back to 768.
 
 The block maintains a constant 768-dimensional representation throughout. Input
 shape `[batch, seq_length, 768]` stays the same after each sublayer, which is
@@ -72,7 +76,8 @@ In the `__init__` method, create the four sublayers:
 - `ln_2`: `LayerNorm(config.n_embd, eps=config.layer_norm_epsilon)`
 - `mlp`: `GPT2MLP(4 * config.n_embd, config)`
 
-The MLP uses `4 * config.n_embd` (3,072 dimensions) as its inner dimension, following the standard transformer ratio.
+The MLP uses `4 * config.n_embd` (3,072 dimensions) as its inner dimension,
+following the standard transformer ratio.
 
 In the `forward` method, implement the two sublayer blocks:
 
@@ -111,4 +116,5 @@ Run `pixi run s06` to verify your implementation.
 
 </details>
 
-**Next**: In [Step 07](./step_07.md), you'll stack 12 transformer blocks together to create the main body of the GPT-2 model.
+**Next**: In [Step 07](./step_07.md), you'll stack 12 transformer blocks together
+to create the main body of the GPT-2 model.

@@ -6,7 +6,7 @@ your experience.
 
 ## Instructions to share with Claude
 
-```
+```text
 I'm working through the MAX LLM Book tutorial, which teaches building GPT-2
 inference step-by-step using the MAX Framework. Please help me with the
 following context in mind:
@@ -20,9 +20,9 @@ following context in mind:
 
 **MAX Framework specifics:**
 - Functions use @F.functional decorator for graph definitions
-- Modules extend max.nn.module_v3.Module base class
-- Tensor operations use max.experimental.functional and max.experimental.tensor
-- Models use max.nn.module_v3.Linear for linear layers
+- Modules extend max.nn.Module base class
+- Tensor operations use max.nn.functional and max.tensor
+- Models use max.nn.Linear for linear layers
 - The tutorial uses MAX Framework's Python API throughout
 
 **How to help me:**
@@ -47,12 +47,14 @@ My current step: [Tell Claude which step you're on]
 Here are some effective ways to ask Claude for help:
 
 ### Understanding concepts
+
 - "Explain how multi-head attention works in the context of step 07"
 - "Why do we use layer normalization before attention instead of after?"
 - "What's the relationship between context_length and position embeddings?"
 
 ### Debugging check failures
-```
+
+```text
 I'm on step 03 and getting this check output:
 [paste check output]
 
@@ -60,12 +62,14 @@ What do I need to implement?
 ```
 
 ### Understanding MAX API
+
 - "What does @mo.graph do and why do we need it?"
 - "How does session.load() map Hugging Face weights to my model?"
 - "Explain the difference between max.nn.Linear and max.ops.linear"
 
 ### Code review
-```
+
+```text
 Here's my implementation for step 05:
 [paste your code]
 
@@ -73,13 +77,15 @@ Can you review it and suggest improvements?
 ```
 
 ### Exploring alternatives
+
 - "Why does this tutorial use RoPE instead of absolute position embeddings?"
 - "What are the tradeoffs of different attention implementations?"
 - "How would this implementation differ for GPT-3 or Llama?"
 
 ## Tips for best results
 
-1. **Be specific about your step**: Always mention which step (01-12) you're working on
+1. **Be specific about your step**: Always mention which step (01-12) you're
+   working on
 2. **Share check output**: Paste the full check output when debugging
 3. **Share your code**: Let Claude see your implementation when asking for help
 4. **Ask follow-ups**: If an explanation isn't clear, ask for clarification or examples
@@ -108,4 +114,5 @@ pixi run s05 2>&1 | claude chat "Here's my check output. What's failing and why?
 - [MAX Framework Documentation](https://docs.modular.com/max/)
 - [Tutorial Repository](https://github.com/modular/max-llm-book)
 - [GPT-2 Paper](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)
-- [Attention Is All You Need](https://arxiv.org/abs/1706.03762) (original Transformer paper)
+- [Attention Is All You Need](https://arxiv.org/abs/1706.03762) (original
+  Transformer paper)

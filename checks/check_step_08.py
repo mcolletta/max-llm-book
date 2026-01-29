@@ -1,5 +1,9 @@
-"""
-Check for Step 08: Language Model Head
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
+"""Check for Step 08: Language Model Head
 
 Validates that MaxGPT2LMHeadModel is correctly implemented.
 """
@@ -12,7 +16,7 @@ steps_dir = Path(__file__).parent.parent / "steps"
 sys.path.insert(0, str(steps_dir))
 
 
-def check_step_08():
+def check_step_08() -> bool:
     """Validate MaxGPT2LMHeadModel implementation."""
     print("Running checks for Step 08: Language Model Head...\n")
 
@@ -42,7 +46,7 @@ def check_step_08():
         return False
 
     # Check 2: Verify required attributes
-    required_attrs = ['transformer', 'lm_head', 'config']
+    required_attrs = ["transformer", "lm_head", "config"]
     for attr in required_attrs:
         if not hasattr(model, attr):
             errors.append(f"MaxGPT2LMHeadModel missing attribute: {attr}")
@@ -50,13 +54,16 @@ def check_step_08():
             print(f"✅ Has attribute: {attr}")
 
     # Check 3: Verify lm_head is Linear
-    if hasattr(model, 'lm_head'):
-        from max.nn.module_v3 import Linear
+    if hasattr(model, "lm_head"):
+        from max.nn import Linear
+
         if not isinstance(model.lm_head, Linear):
-            errors.append(f"lm_head should be Linear, got {type(model.lm_head)}")
+            errors.append(
+                f"lm_head should be Linear, got {type(model.lm_head)}"
+            )
 
     # Check 4: Verify forward method
-    if not hasattr(model, 'forward'):
+    if not hasattr(model, "forward"):
         errors.append("MaxGPT2LMHeadModel missing forward method")
     else:
         print("✅ Has forward method")
@@ -64,16 +71,20 @@ def check_step_08():
     # Check 5: Try a forward pass
     try:
         from max.dtype import DType
-        from max.experimental.tensor import Tensor
+        from max.tensor import Tensor
 
         # Create dummy token IDs [batch=1, seq_len=10]
-        dummy_input = Tensor.constant([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], dtype=DType.int64)
+        dummy_input = Tensor.constant(
+            [[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], dtype=DType.int64
+        )
         output = model(dummy_input)
 
         expected_shape = (1, 10, 50257)  # [batch, seq_len, vocab_size]
         actual_shape = tuple(int(dim) for dim in output.shape)
         if actual_shape != expected_shape:
-            errors.append(f"Output shape mismatch: expected {expected_shape}, got {actual_shape}")
+            errors.append(
+                f"Output shape mismatch: expected {expected_shape}, got {actual_shape}"
+            )
         else:
             print(f"✅ Forward pass successful with shape: {actual_shape}")
     except Exception as e:

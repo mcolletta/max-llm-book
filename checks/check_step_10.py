@@ -1,11 +1,16 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Check for Step 10: Text Generation
 
 Validates that generate_text function is correctly implemented.
 """
 
-import sys
 import inspect
+import sys
 from pathlib import Path
 
 # Add steps directory to path for imports
@@ -13,7 +18,7 @@ steps_dir = Path(__file__).parent.parent / "steps"
 sys.path.insert(0, str(steps_dir))
 
 
-def check_step_10():
+def check_step_10() -> bool:
     """Validate generate_text implementation."""
     print("Running checks for Step 10: Text Generation...\n")
 
@@ -31,7 +36,7 @@ def check_step_10():
     # Check 1: Verify function signature
     sig = inspect.signature(generate_text)
     params = list(sig.parameters.keys())
-    required_params = ['model', 'tokenizer', 'device', 'prompt']
+    required_params = ["model", "tokenizer", "device", "prompt"]
     for param in required_params:
         if param not in params:
             errors.append(f"generate_text missing required parameter: {param}")
@@ -40,23 +45,27 @@ def check_step_10():
 
     # Check 2: Verify optional parameters with defaults
     optional_params = {
-        'max_new_tokens': 50,
-        'temperature': 0.8,
-        'do_sample': True
+        "max_new_tokens": 50,
+        "temperature": 0.8,
+        "do_sample": True,
     }
-    for param, default_value in optional_params.items():
+    for param, _default_value in optional_params.items():
         if param in params:
             param_obj = sig.parameters[param]
             if param_obj.default != inspect.Parameter.empty:
-                print(f"✅ generate_text has optional parameter: {param} (default={param_obj.default})")
+                print(
+                    f"✅ generate_text has optional parameter: {param} (default={param_obj.default})"
+                )
             else:
-                errors.append(f"Parameter '{param}' should have a default value")
+                errors.append(
+                    f"Parameter '{param}' should have a default value"
+                )
         else:
             errors.append(f"generate_text missing optional parameter: {param}")
 
     # Check 3: Verify return type annotation (if present)
     if sig.return_annotation != inspect.Signature.empty:
-        if sig.return_annotation == str:
+        if sig.return_annotation is str:
             print("✅ generate_text annotated to return str")
 
     # Note: We cannot easily test the actual generation without a compiled model,

@@ -1,29 +1,32 @@
-import math
-import pytest
-import numpy as np
-from unittest.mock import Mock, MagicMock, patch
-from max.driver import CPU
-from max.dtype import DType
-from max.experimental.tensor import Tensor
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
+from unittest.mock import Mock, patch
 
+import numpy as np
 from main import (
-    GPT2Config,
     GPT2MLP,
-    causal_mask,
+    GPT2Block,
+    GPT2Config,
     GPT2MultiHeadAttention,
     LayerNorm,
-    GPT2Block,
-    MaxGPT2Model,
     MaxGPT2LMHeadModel,
-    encode_text,
+    MaxGPT2Model,
+    causal_mask,
     decode_tokens,
+    encode_text,
 )
+from max.driver import CPU
+from max.dtype import DType
+from max.tensor import Tensor
 
 
 class TestGPT2Config:
     """Test GPT2Config dataclass."""
 
-    def test_default_values(self):
+    def test_default_values(self) -> None:
         """Test that GPT2Config has correct default values."""
         config = GPT2Config()
         assert config.vocab_size == 50257
@@ -34,7 +37,7 @@ class TestGPT2Config:
         assert config.n_inner is None
         assert config.layer_norm_epsilon == 1e-5
 
-    def test_custom_values(self):
+    def test_custom_values(self) -> None:
         """Test that GPT2Config can be instantiated with custom values."""
         config = GPT2Config()
         config.n_embd = 512
@@ -46,14 +49,14 @@ class TestGPT2Config:
 class TestGPT2MLP:
     """Test GPT2MLP module."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test that GPT2MLP initializes correctly."""
         config = GPT2Config()
         mlp = GPT2MLP(intermediate_size=3072, config=config)
         assert mlp.c_fc is not None
         assert mlp.c_proj is not None
 
-    def test_forward_pass_shape(self):
+    def test_forward_pass_shape(self) -> None:
         """Test that GPT2MLP produces correct output shape."""
         config = GPT2Config()
         mlp = GPT2MLP(intermediate_size=3072, config=config)
@@ -69,19 +72,23 @@ class TestGPT2MLP:
 class TestCausalMask:
     """Test causal_mask function."""
 
-    def test_causal_mask_shape(self):
+    def test_causal_mask_shape(self) -> None:
         """Test that causal mask has correct shape."""
         seq_len = 5
         num_tokens = 0
-        mask = causal_mask(seq_len, num_tokens, dtype=DType.float32, device=CPU())
+        mask = causal_mask(
+            seq_len, num_tokens, dtype=DType.float32, device=CPU()
+        )
         # Compare as lists of ints since MAX returns Dim objects
         assert [int(d) for d in mask.shape] == [seq_len, seq_len]
 
-    def test_causal_mask_values(self):
+    def test_causal_mask_values(self) -> None:
         """Test that causal mask has correct values (upper triangle is -inf)."""
         seq_len = 4
         num_tokens = 0
-        mask = causal_mask(seq_len, num_tokens, dtype=DType.float32, device=CPU())
+        mask = causal_mask(
+            seq_len, num_tokens, dtype=DType.float32, device=CPU()
+        )
 
         # Convert to numpy for inspection
         mask_np = np.from_dlpack(mask)
@@ -100,7 +107,7 @@ class TestCausalMask:
 class TestGPT2MultiHeadAttention:
     """Test GPT2MultiHeadAttention module."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test that GPT2MultiHeadAttention initializes correctly."""
         config = GPT2Config()
         attn = GPT2MultiHeadAttention(config)
@@ -110,13 +117,15 @@ class TestGPT2MultiHeadAttention:
         assert attn.c_attn is not None
         assert attn.c_proj is not None
 
-    def test_split_heads_shape(self):
+    def test_split_heads_shape(self) -> None:
         """Test that _split_heads produces correct shape."""
         config = GPT2Config()
         attn = GPT2MultiHeadAttention(config)
 
         batch_size, seq_len = 2, 10
-        tensor = Tensor.ones([batch_size, seq_len, config.n_embd], dtype=DType.float32)
+        tensor = Tensor.ones(
+            [batch_size, seq_len, config.n_embd], dtype=DType.float32
+        )
         split = attn._split_heads(tensor, config.n_head, attn.head_dim)
 
         # Should be [batch, n_head, seq_len, head_dim]
@@ -127,21 +136,26 @@ class TestGPT2MultiHeadAttention:
             attn.head_dim,
         ]
 
-    def test_merge_heads_shape(self):
+    def test_merge_heads_shape(self) -> None:
         """Test that _merge_heads produces correct shape."""
         config = GPT2Config()
         attn = GPT2MultiHeadAttention(config)
 
         batch_size, seq_len = 2, 10
         tensor = Tensor.ones(
-            [batch_size, config.n_head, seq_len, attn.head_dim], dtype=DType.float32
+            [batch_size, config.n_head, seq_len, attn.head_dim],
+            dtype=DType.float32,
         )
         merged = attn._merge_heads(tensor, config.n_head, attn.head_dim)
 
         # Should be [batch, seq_len, n_embd]
-        assert [int(d) for d in merged.shape] == [batch_size, seq_len, config.n_embd]
+        assert [int(d) for d in merged.shape] == [
+            batch_size,
+            seq_len,
+            config.n_embd,
+        ]
 
-    def test_forward_pass_shape(self):
+    def test_forward_pass_shape(self) -> None:
         """Test that attention forward pass produces correct output shape."""
         config = GPT2Config()
         attn = GPT2MultiHeadAttention(config)
@@ -155,7 +169,7 @@ class TestGPT2MultiHeadAttention:
 class TestLayerNorm:
     """Test LayerNorm module."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test that LayerNorm initializes correctly."""
         dim = 768
         ln = LayerNorm(dim, eps=1e-5)
@@ -163,7 +177,7 @@ class TestLayerNorm:
         assert [int(d) for d in ln.weight.shape] == [dim]
         assert [int(d) for d in ln.bias.shape] == [dim]
 
-    def test_forward_pass_shape(self):
+    def test_forward_pass_shape(self) -> None:
         """Test that LayerNorm produces correct output shape."""
         dim = 768
         ln = LayerNorm(dim)
@@ -177,7 +191,7 @@ class TestLayerNorm:
 class TestGPT2Block:
     """Test GPT2Block module."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test that GPT2Block initializes correctly."""
         config = GPT2Config()
         block = GPT2Block(config)
@@ -186,14 +200,14 @@ class TestGPT2Block:
         assert block.ln_2 is not None
         assert block.mlp is not None
 
-    def test_initialization_with_custom_inner_dim(self):
+    def test_initialization_with_custom_inner_dim(self) -> None:
         """Test that GPT2Block uses custom inner_dim when provided."""
         config = GPT2Config()
         config.n_inner = 2048
         block = GPT2Block(config)
         assert block.mlp is not None
 
-    def test_forward_pass_shape(self):
+    def test_forward_pass_shape(self) -> None:
         """Test that GPT2Block produces correct output shape."""
         config = GPT2Config()
         block = GPT2Block(config)
@@ -207,7 +221,7 @@ class TestGPT2Block:
 class TestMaxGPT2Model:
     """Test MaxGPT2Model module."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test that MaxGPT2Model initializes correctly."""
         config = GPT2Config()
         model = MaxGPT2Model(config)
@@ -216,7 +230,7 @@ class TestMaxGPT2Model:
         assert model.h is not None
         assert model.ln_f is not None
 
-    def test_forward_pass_shape(self):
+    def test_forward_pass_shape(self) -> None:
         """Test that MaxGPT2Model produces correct output shape."""
         config = GPT2Config()
         model = MaxGPT2Model(config)
@@ -226,13 +240,17 @@ class TestMaxGPT2Model:
         output = model(input_ids)
 
         # Output should be [batch, seq_len, n_embd]
-        assert [int(d) for d in output.shape] == [batch_size, seq_len, config.n_embd]
+        assert [int(d) for d in output.shape] == [
+            batch_size,
+            seq_len,
+            config.n_embd,
+        ]
 
 
 class TestMaxGPT2LMHeadModel:
     """Test MaxGPT2LMHeadModel module."""
 
-    def test_initialization(self):
+    def test_initialization(self) -> None:
         """Test that MaxGPT2LMHeadModel initializes correctly."""
         config = GPT2Config()
         model = MaxGPT2LMHeadModel(config)
@@ -240,7 +258,7 @@ class TestMaxGPT2LMHeadModel:
         assert model.transformer is not None
         assert model.lm_head is not None
 
-    def test_forward_pass_shape(self):
+    def test_forward_pass_shape(self) -> None:
         """Test that MaxGPT2LMHeadModel produces correct output shape."""
         config = GPT2Config()
         model = MaxGPT2LMHeadModel(config)
@@ -261,13 +279,15 @@ class TestTokenizationFunctions:
     """Test tokenization and decoding functions."""
 
     @patch("main.GPT2Tokenizer")
-    def test_encode_text(self, mock_tokenizer_class):
+    def test_encode_text(self, mock_tokenizer_class: Mock) -> None:
         """Test encode_text function."""
         # Setup mock
         mock_tokenizer = Mock()
         mock_tokenizer.encode.return_value = [15496, 995]  # "Hello world"
 
-        result = encode_text("Hello world", mock_tokenizer, CPU(), max_length=128)
+        result = encode_text(
+            "Hello world", mock_tokenizer, CPU(), max_length=128
+        )
 
         # Check that tokenizer.encode was called correctly
         mock_tokenizer.encode.assert_called_once_with(
@@ -280,14 +300,16 @@ class TestTokenizationFunctions:
         assert result.shape[1] == 2  # number of tokens
 
     @patch("main.GPT2Tokenizer")
-    def test_decode_tokens(self, mock_tokenizer_class):
+    def test_decode_tokens(self, mock_tokenizer_class: Mock) -> None:
         """Test decode_tokens function."""
         # Setup mock
         mock_tokenizer = Mock()
         mock_tokenizer.decode.return_value = "Hello world"
 
         # Create token tensor
-        token_ids = Tensor.constant([15496, 995], dtype=DType.int64, device=CPU())
+        token_ids = Tensor.constant(
+            [15496, 995], dtype=DType.int64, device=CPU()
+        )
         result = decode_tokens(token_ids, mock_tokenizer)
 
         # Check that tokenizer.decode was called
@@ -295,14 +317,16 @@ class TestTokenizationFunctions:
         assert result == "Hello world"
 
     @patch("main.GPT2Tokenizer")
-    def test_decode_tokens_2d_tensor(self, mock_tokenizer_class):
+    def test_decode_tokens_2d_tensor(self, mock_tokenizer_class: Mock) -> None:
         """Test decode_tokens with 2D tensor input."""
         # Setup mock
         mock_tokenizer = Mock()
         mock_tokenizer.decode.return_value = "Hello world"
 
         # Create 2D token tensor (batch x seq)
-        token_ids = Tensor.constant([[15496, 995]], dtype=DType.int64, device=CPU())
+        token_ids = Tensor.constant(
+            [[15496, 995]], dtype=DType.int64, device=CPU()
+        )
         result = decode_tokens(token_ids, mock_tokenizer)
 
         # Should flatten and decode
@@ -313,14 +337,14 @@ class TestTokenizationFunctions:
 class TestModelDimensions:
     """Test that model dimensions are consistent throughout."""
 
-    def test_head_dimensions(self):
+    def test_head_dimensions(self) -> None:
         """Test that head dimensions divide evenly."""
         config = GPT2Config()
         assert config.n_embd % config.n_head == 0
         head_dim = config.n_embd // config.n_head
         assert head_dim == 64
 
-    def test_mlp_inner_dimension(self):
+    def test_mlp_inner_dimension(self) -> None:
         """Test default MLP inner dimension is 4x embedding."""
         config = GPT2Config()
         expected_inner = 4 * config.n_embd

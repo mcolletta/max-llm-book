@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Step 06: Transformer Block
 
@@ -13,18 +18,16 @@ Run: pixi run s06
 """
 
 # TODO: Import required modules
-# Hint: You'll need Module from max.nn.module_v3
+# Hint: You'll need Module from max.nn
 
+from max.tensor import Tensor
 from step_01 import GPT2Config
-from step_02 import GPT2MLP
-from step_04 import GPT2MultiHeadAttention
-from step_05 import LayerNorm
 
 
 class GPT2Block(Module):
     """Complete GPT-2 transformer block."""
 
-    def __init__(self, config: GPT2Config):
+    def __init__(self, config: GPT2Config) -> None:
         """Initialize transformer block.
 
         Args:
@@ -55,7 +58,7 @@ class GPT2Block(Module):
         # Hint: Use GPT2MLP(inner_dim, config)
         self.mlp = None
 
-    def forward(self, hidden_states):
+    def forward(self, hidden_states: Tensor) -> Tensor:
         """Apply transformer block.
 
         Args:

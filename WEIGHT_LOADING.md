@@ -11,7 +11,8 @@ The easiest way to use pretrained weights is to run the included example:
 pixi run huggingface
 ```
 
-This loads GPT-2 weights from HuggingFace and runs generation examples comparing MAX and PyTorch implementations.
+This loads GPT-2 weights from HuggingFace and runs generation examples comparing
+MAX and PyTorch implementations.
 
 ## How weight loading works
 
@@ -42,10 +43,11 @@ max_model.load_state_dict(torch_model.state_dict())
 
 ### 3. Transpose Conv1D weights
 
-Hugging Face GPT-2 uses `Conv1D` layers (which store transposed weights) instead of `Linear` layers. You need to transpose these weights after loading:
+Hugging Face GPT-2 uses `Conv1D` layers (which store transposed weights) instead
+of `Linear` layers. You need to transpose these weights after loading:
 
 ```python
-from max.nn.module_v3 import Linear
+from max.nn import Linear
 
 # Transpose weights for linear layers that correspond to Conv1D in HuggingFace
 max_model.to(device)
@@ -71,8 +73,8 @@ import numpy as np
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from max.driver import CPU
 from max.dtype import DType
-from max.experimental.tensor import Tensor
-from max.nn.module_v3 import Linear
+from max.tensor import Tensor
+from max.nn import Linear
 
 from solutions.solution_01 import GPT2Config
 from solutions.solution_13 import MaxGPT2LMHeadModel
@@ -144,12 +146,15 @@ max_model = MaxGPT2LMHeadModel(config)
 
 ## Why transpose weights?
 
-HuggingFace's GPT-2 implementation uses `nn.Conv1D` instead of `nn.Linear` for historical reasons (matching the original OpenAI implementation). `Conv1D` in 1D is mathematically equivalent to `Linear`, but stores weights transposed:
+HuggingFace's GPT-2 implementation uses `nn.Conv1D` instead of `nn.Linear` for
+historical reasons (matching the original OpenAI implementation). `Conv1D` in 1D
+is mathematically equivalent to `Linear`, but stores weights transposed:
 
 - **Conv1D weight shape**: `[input_features, output_features]`
 - **Linear weight shape**: `[output_features, input_features]`
 
-When loading state dict, MAX interprets these as Linear weights, so we transpose them to match the expected format.
+When loading state dict, MAX interprets these as Linear weights, so we transpose
+them to match the expected format.
 
 ## Verification
 

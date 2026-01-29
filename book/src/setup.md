@@ -1,6 +1,8 @@
 # Project Setup
 
-You'll first need to clone [the GitHub repository](https://github.com/modular/max-llm-book) and navigate to the repository:
+You'll first need to clone
+[the GitHub repository](https://github.com/modular/max-llm-book) and navigate to
+the repository:
 
 ```sh
 git clone https://github.com/modular/max-llm-book
@@ -9,7 +11,7 @@ cd max-llm-book
 
 Then download and install [pixi](https://pixi.sh/dev/):
 
-```
+```sh
 curl -fsSL https://pixi.sh/install.sh | sh
 ```
 
@@ -26,7 +28,7 @@ Each step includes automated checks that verify your implementation before movin
 forward. This immediate feedback helps you catch issues early and build
 confidence. Initially, checks will fail because the implementation isn't complete:
 
-```sh
+```text
 ✨ Pixi task (s01): python checks/check_step_01.py
 Running checks for Step 01: Model Configuration...
 
@@ -44,7 +46,7 @@ Each failure tells you exactly what to implement.
 When your implementation is
 correct, you'll see:
 
-```output
+```text
 ✨ Pixi task (s01): python checks/check_step_01.py
 Running checks for Step 01: Model Configuration...
 

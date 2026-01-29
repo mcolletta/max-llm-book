@@ -66,19 +66,22 @@ You'll use the following MAX operations to complete this task:
 
 **Linear layers**:
 
-- [`Linear(in_features, out_features, bias=True)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.module_v3.Linear): Q/K/V and output projections
+- [`Linear(in_features, out_features, bias=True)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.Linear):
+  Q/K/V and output projections
 
 **Tensor operations**:
 
 - `tensor.reshape(new_shape)`: Splits or merges head dimension
 - `tensor.transpose(axis1, axis2)`: Rearranges dimensions for parallel attention
-- [`F.split(tensor, split_sizes, axis)`](https://docs.modular.com/max/api/python/experimental/functional#max.experimental.functional.split): Divides Q/K/V from combined projection
+- [`F.split(tensor, split_sizes, axis)`](https://docs.modular.com/max/api/python/nn/functional#max.nn.functional.split):
+  Divides Q/K/V from combined projection
 
 </div>
 
 ## Implementing multi-head attention
 
-You'll create the `GPT2MultiHeadAttention` class with helper methods for splitting and merging heads.
+You'll create the `GPT2MultiHeadAttention` class with helper methods for
+splitting and merging heads.
 
 First, import the required modules. You'll need `math` for scaling, `functional
 as F` for operations, `Tensor` for type hints, `device` and `dtype` utilities, and
@@ -87,14 +90,16 @@ as F` for operations, `Tensor` for type hints, `device` and `dtype` utilities, a
 
 In the `__init__` method, create the projection layers and store configuration:
 
-- Combined Q/K/V projection: `Linear(embed_dim, 3 * embed_dim, bias=True)` stored as `self.c_attn`
+- Combined Q/K/V projection:
+  `Linear(embed_dim, 3 * embed_dim, bias=True)` stored as `self.c_attn`
 - Output projection: `Linear(embed_dim, embed_dim, bias=True)` stored as `self.c_proj`
 - Store `self.num_heads` (12) and `self.head_dim` (64) from config
 - Calculate `self.split_size` for splitting Q, K, V later
 
 Implement `_split_heads` to reshape for parallel attention:
 
-- Calculate new shape by replacing the last dimension: `tensor.shape[:-1] + [num_heads, attn_head_size]`
+- Calculate new shape by replacing the last dimension:
+  `tensor.shape[:-1] + [num_heads, attn_head_size]`
 - Reshape to add the head dimension: `tensor.reshape(new_shape)`
 - Transpose to move heads to position 1: `tensor.transpose(-3, -2)`
 - Returns shape `[batch, num_heads, seq_length, head_size]`
@@ -117,10 +122,14 @@ Implement `_attn` to compute scaled dot-product attention for all heads:
 In the `forward` method, orchestrate the complete multi-head attention:
 
 - Project to Q/K/V: `qkv = self.c_attn(hidden_states)`
-- Split into separate tensors: `F.split(qkv, [self.split_size, self.split_size, self.split_size], axis=-1)`
-- Split heads for each: `query = self._split_heads(query, self.num_heads, self.head_dim)` (repeat for key, value)
+- Split into separate tensors:
+  `F.split(qkv, [self.split_size, self.split_size, self.split_size], axis=-1)`
+- Split heads for each:
+  `query = self._split_heads(query, self.num_heads, self.head_dim)` (repeat for
+  key, value)
 - Compute attention: `attn_output = self._attn(query, key, value)`
-- Merge heads: `attn_output = self._merge_heads(attn_output, self.num_heads, self.head_dim)`
+- Merge heads:
+  `attn_output = self._merge_heads(attn_output, self.num_heads, self.head_dim)`
 - Final projection: `return self.c_proj(attn_output)`
 
 **Implementation** (`step_04.py`):
@@ -142,4 +151,5 @@ Run `pixi run s04` to verify your implementation.
 
 </details>
 
-**Next**: In [Step 05](./step_05.md), you'll implement layer normalization to stabilize activations for effective training.
+**Next**: In [Step 05](./step_05.md), you'll implement layer normalization to
+stabilize activations for effective training.

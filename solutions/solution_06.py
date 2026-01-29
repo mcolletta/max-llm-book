@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Solution for Step 06: Transformer Block
 
@@ -5,8 +10,8 @@ This module implements a complete GPT-2 transformer block, combining
 multi-head attention, MLP, layer normalization, and residual connections.
 """
 
-from max.nn.module_v3 import Module
-
+from max.nn import Module
+from max.tensor import Tensor
 from step_01 import GPT2Config
 from step_02 import GPT2MLP
 from step_04 import GPT2MultiHeadAttention
@@ -21,7 +26,7 @@ class GPT2Block(Module):
     2. x = x + mlp(layer_norm(x))
     """
 
-    def __init__(self, config: GPT2Config):
+    def __init__(self, config: GPT2Config) -> None:
         """Initialize transformer block.
 
         Args:
@@ -46,7 +51,7 @@ class GPT2Block(Module):
         # Feed-forward MLP
         self.mlp = GPT2MLP(inner_dim, config)
 
-    def forward(self, hidden_states):
+    def forward(self, hidden_states: Tensor) -> Tensor:
         """Apply transformer block.
 
         Args:

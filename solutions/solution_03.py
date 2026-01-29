@@ -1,3 +1,8 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 """
 Solution for Step 03: Causal Masking
 
@@ -5,11 +10,11 @@ This module implements causal attention masking that prevents tokens from
 attending to future positions in autoregressive generation.
 """
 
+import max.functional as F
 from max.driver import Device
 from max.dtype import DType
-from max.experimental import functional as F
-from max.experimental.tensor import Tensor
 from max.graph import Dim, DimLike
+from max.tensor import Tensor
 
 
 @F.functional
@@ -19,7 +24,7 @@ def causal_mask(
     *,
     dtype: DType,
     device: Device,
-):
+) -> Tensor:
     """Create a causal mask for autoregressive attention.
 
     Args:

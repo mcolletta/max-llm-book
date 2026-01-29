@@ -1,7 +1,12 @@
+# ===----------------------------------------------------------------------=== #
+#
+# This file is Modular Inc proprietary.
+#
+# ===----------------------------------------------------------------------=== #
 from transformers import GPT2LMHeadModel
 
 
-def get_gpt2_config():
+def get_gpt2_config() -> None:
     # Load HuggingFace model for weight transfer
     print("Loading HuggingFace GPT-2 model...")
     torch_model = GPT2LMHeadModel.from_pretrained("gpt2")
