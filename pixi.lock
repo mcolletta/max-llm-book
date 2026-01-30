@@ -157,7 +157,7 @@ environments:
       - conda: https://conda.modular.com/max-nightly/linux-64/max-core-26.2.0.dev2026012905-release.conda
       - conda: https://conda.modular.com/max-nightly/noarch/max-pipelines-26.2.0.dev2026012905-release.conda
       - conda: https://conda.modular.com/max-nightly/noarch/mblack-26.2.0.dev2026012905-release.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/mdbook-0.5.2-hb17b654_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/mdbook-0.4.52-hb17b654_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/mkl-2025.3.0-h0e700b2_463.conda
       - conda: https://conda.modular.com/max-nightly/noarch/modular-26.2.0.dev2026012905-release.conda
@@ -422,7 +422,7 @@ environments:
       - conda: https://conda.modular.com/max-nightly/osx-arm64/max-core-26.2.0.dev2026012905-release.conda
       - conda: https://conda.modular.com/max-nightly/noarch/max-pipelines-26.2.0.dev2026012905-release.conda
       - conda: https://conda.modular.com/max-nightly/noarch/mblack-26.2.0.dev2026012905-release.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/mdbook-0.5.2-h8d80559_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/mdbook-0.4.52-hcdef695_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
       - conda: https://conda.modular.com/max-nightly/noarch/modular-26.2.0.dev2026012905-release.conda
       - conda: https://conda.modular.com/max-nightly/osx-arm64/mojo-0.26.2.0.dev2026012905-release.conda
@@ -3823,9 +3823,9 @@ packages:
   license: MIT
   size: 135847
   timestamp: 1769664937854
-- conda: https://conda.anaconda.org/conda-forge/linux-64/mdbook-0.5.2-hb17b654_0.conda
-  sha256: 2657d098213214b835a905e8fadb4e07420e74743462e3fa8951c5b7cc6e1947
-  md5: 15a8190221450654518f22ff57d0b2d0
+- conda: https://conda.anaconda.org/conda-forge/linux-64/mdbook-0.4.52-hb17b654_0.conda
+  sha256: 324d8270a6bc20f6b6ece1d05507a1415585dc84b1f980671328df29aad2c2ff
+  md5: 50207b127e50bc000a4243355a88980a
   depends:
   - libgcc >=14
   - __glibc >=2.17,<3.0.a0
@@ -3833,19 +3833,19 @@ packages:
   - __glibc >=2.17
   license: MPL-2.0
   license_family: MOZILLA
-  size: 4050995
-  timestamp: 1765667562729
-- conda: https://conda.anaconda.org/conda-forge/osx-arm64/mdbook-0.5.2-h8d80559_0.conda
-  sha256: 0771ac3ae88b73f4b83de0c95e1ad5b7aa533ce2ddb74453f8f96748f80fa983
-  md5: c16f2fef9f593ffb8b6bacbf606c17ba
+  size: 3886947
+  timestamp: 1752567088027
+- conda: https://conda.anaconda.org/conda-forge/osx-arm64/mdbook-0.4.52-hcdef695_0.conda
+  sha256: 763d9482a9468fd7d2d698ba18d5cc2ba3d74b155a7eeb1b8847304f71218788
+  md5: df16d0f6acc6b4d35ff1f398b065b2ca
   depends:
   - __osx >=11.0
   constrains:
   - __osx >=11.0
   license: MPL-2.0
   license_family: MOZILLA
-  size: 3765499
-  timestamp: 1765667576491
+  size: 3578857
+  timestamp: 1752567146325
 - conda: https://conda.anaconda.org/conda-forge/noarch/mdurl-0.1.2-pyhd8ed1ab_1.conda
   sha256: 78c1bbe1723449c52b7a9df1af2ee5f005209f67e40b6e1d3c7619127c43b1c7
   md5: 592132998493b3ff25fd7479396e8351
