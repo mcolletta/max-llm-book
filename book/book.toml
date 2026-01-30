@@ -19,11 +19,18 @@ additional-js = [
 ]
 default-theme = "light"
 preferred-dark-theme = "ayu"
+copy-fonts = true
+favicon_svg=true
 smart-punctuation = true
 no-section-label = true
 git-repository-url = "https://github.com/modular/max-llm-book"
-git-repository-icon = "fa-brands fa-github"
 mathjax-support = true
+theme-switcher = true
+no-theme-selection = false
+draft = false
+
+[output.html.highlight]
+enable = true
 
 [output.html.print]
 enable = true
@@ -42,9 +49,13 @@ heading-split-level = 3
 [output.html.fold]
 enable = false
 
+[output.html.math]
+mode = "katex"
+
 [build]
 build-dir = "html"
 create-missing = true
+extra-files = ["logo"]
 
 [preprocessor.index]
 index = false
@@ -52,4 +63,3 @@ index = false
 [preprocessor.links]
 # Enables use of {{#include file.md}} to include other files
 renderers = ["html"]
-some-attribute = "value"
