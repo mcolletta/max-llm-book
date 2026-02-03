@@ -66,14 +66,14 @@ You'll use the following MAX operations to complete this task:
 
 **Linear layers**:
 
-- [`Linear(in_features, out_features, bias=True)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.Linear):
+- [`Linear(in_features, out_features, bias=True)`](https://docs.modular.com/max/api/python/nn/linear/):
   Q/K/V and output projections
 
 **Tensor operations**:
 
 - `tensor.reshape(new_shape)`: Splits or merges head dimension
 - `tensor.transpose(axis1, axis2)`: Rearranges dimensions for parallel attention
-- [`F.split(tensor, split_sizes, axis)`](https://docs.modular.com/max/api/python/nn/functional#max.nn.functional.split):
+- [`F.split(tensor, split_sizes, axis)`](https://docs.modular.com/max/api/python/functional#max.functional.split):
   Divides Q/K/V from combined projection
 
 </div>

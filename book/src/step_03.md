@@ -56,16 +56,16 @@ You'll use the following MAX operations to complete this task:
 
 **Functional decorator**:
 
-- [`@F.functional`](https://docs.modular.com/max/api/python/nn/functional/#max.nn.functional.functional):
+- [`@F.functional`](https://docs.modular.com/max/api/python/functional):
   Converts functions to graph operations for MAX compilation
 
 **Tensor operations**:
 
 - [`Tensor.constant()`](https://docs.modular.com/max/api/python/tensor#max.tensor.Tensor.constant):
   Creates a scalar constant tensor
-- [`F.broadcast_to()`](https://docs.modular.com/max/api/python/nn/functional#max.nn.functional.broadcast_to):
+- [`F.broadcast_to()`](https://docs.modular.com/max/api/python/functional#max.functional.broadcast_to):
   Expands tensor dimensions to target shape
-- [`F.band_part()`](https://docs.modular.com/max/api/python/nn/functional#max.nn.functional.band_part):
+- [`F.band_part()`](https://docs.modular.com/max/api/python/functional#max.functional.band_part):
   Extracts band matrix (keeps diagonal band, zeros out rest)
 
 </div>
@@ -79,7 +79,7 @@ You'll create the causal mask in several steps:
      `max.driver` - specifies hardware device (CPU/GPU)
    - [`DType`](https://docs.modular.com/max/api/python/dtype) from `max.dtype` -
      data type specification
-   - [`functional`](https://docs.modular.com/max/api/python/nn/functional)
+   - [`functional`](https://docs.modular.com/max/api/python/functional)
      as `F` from `max.nn` - functional operations library
    - [`Tensor`](https://docs.modular.com/max/api/python/tensor)
      from `max.tensor` - tensor operations

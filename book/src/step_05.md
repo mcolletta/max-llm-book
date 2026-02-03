@@ -54,7 +54,7 @@ You'll use the following MAX operations to complete this task:
 
 **Modules**:
 
-- [`Module`](https://docs.modular.com/max/api/python/nn/module_v3/): The Module
+- [`Module`](https://docs.modular.com/max/api/python/nn/module/): The Module
   class used for eager tensors
 
 **Tensor initialization**:
@@ -66,7 +66,7 @@ You'll use the following MAX operations to complete this task:
 
 **Layer normalization**:
 
-- [`F.layer_norm()`](https://docs.modular.com/max/api/python/nn/functional#max.nn.functional.layer_norm):
+- [`F.layer_norm()`](https://docs.modular.com/max/api/python/functional#max.functional.layer_norm):
   Applies layer normalization with parameters: `input`, `gamma` (weight), `beta`
   (bias), and `epsilon`
 

@@ -36,7 +36,7 @@ using a lookup table with 50,257 entries (one per vocabulary token).
 token order.
 
 **Transformer blocks (`h`)**: 12 identical blocks stacked using MAX's
-[`Sequential`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.Sequential)
+[`Sequential`](https://docs.modular.com/max/api/python/nn/sequential/)
 module. Sequential applies blocks in order, passing each block's output to the
 next.
 
@@ -58,7 +58,7 @@ position embeddings with `self.wpe(position_indices)`. Add them together
 element-wise, as both are shape `[batch, seq_length, 768]`.
 
 Then, pass through the transformer blocks with `self.h(x)`. The
-[`Sequential`](/max/api/python/nn/module_v3#max.nn.Sequential)
+[`Sequential`](https://docs.modular.com/max/api/python/nn/sequential/)
 module applies all 12 transformer blocks in order, each refining the representation.
 
 Finally, normalize the output with `self.ln_f(x)` and return the result. The
@@ -72,12 +72,12 @@ You'll use the following MAX operations to complete this task:
 
 **Module composition**:
 
-- [`Sequential(*modules)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.Sequential):
+- [`Sequential(*modules)`](https://docs.modular.com/max/api/python/nn/sequential/):
   Chains transformer blocks in sequence
 
 **Embeddings**:
 
-- [`Embedding(num_embeddings, dim)`](https://docs.modular.com/max/api/python/nn/module_v3#max.nn.Embedding):
+- [`Embedding(num_embeddings, dim)`](https://docs.modular.com/max/api/python/nn/embedding/):
   Token and position embeddings
 
 **Position generation**:

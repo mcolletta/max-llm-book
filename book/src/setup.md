@@ -79,8 +79,9 @@ useful for:
 - **Debugging check failures**: Paste check output to understand what's missing
 - **Exploring alternatives**: Ask "why this approach?" to deepen your understanding
 
-If you're using Claude, see [claude.md](./claude.md) for custom instructions
-tailored to this tutorial.
+If you're using Claude, see
+[claude.md](https://github.com/modular/max-llm-book/blob/main/book/src/claude.md)
+for custom instructions tailored to this tutorial.
 
 ## Prerequisites
 
